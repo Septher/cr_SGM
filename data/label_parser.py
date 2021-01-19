@@ -65,10 +65,20 @@ def parse_hdisk_label(raw_hdisk):
     return hdisk_dict
 
 def parse_gcard_label(raw_gcards):
+    company_pattern = "(INTEL|AMD|NVIDIA)"
+    series_pattern = "INTEGRATED|GTX|RADEON|CELERON"
+    num_pattern = "(R|GTX|Graphics) ?(\d+)"
+    gcard_parsed = dict()
     for gcard in raw_gcards:
-        print(gcard)
+        company = re.findall(company_pattern, gcard.upper())
+        series = re.findall(series_pattern, gcard.upper())
+        data = {}
+        if len(company) > 0:
+            data["company"] = company[0]
+        if len(series) > 0:
+            data["series"] = series[0]
+        gcard_parsed[gcard] = data
 
-    return
 
 def parse_label(raw_label):
     parsed_label_path = "processed/labels_parsed.json"
@@ -87,10 +97,6 @@ def parse_label(raw_label):
     #     outfile.close()
 
 
-def label_smooth():
-
-    return
-
 def debug(items):
     pattern = "(\d+(?:\.\d+)?)"
     for item in items:
@@ -100,4 +106,3 @@ def debug(items):
 if __name__ == '__main__':
     raw_label = load_label()
     parse_label(raw_label)
-    label_smooth()
