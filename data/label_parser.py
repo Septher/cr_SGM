@@ -35,7 +35,6 @@ def parse_screen_label(raw_screens):
             print(screen + ": format error")
             continue
         screen_dic[screen] = get_screen_id(float(size[0]))
-    print(screen_dic)
     return screen_dic
 
 def get_cpu_id(company, freq, gen):
@@ -95,7 +94,6 @@ def parse_ram_label(raw_rams):
         sz = re.findall(sz_pattern, ram)
         gen = re.findall(gen_pattern, ram)
         ram_dict[ram] = get_ram_id(int(sz[0]), int(gen[0]) if len(gen) == 1 else None)
-    print(ram_dict)
     return ram_dict
 
 SSD_quantile = [16, 32, 128, 256, 512]
@@ -124,7 +122,6 @@ def parse_hdisk_label(raw_hdisk):
             continue
         size = int(result[0][0]) * (1024 if result[0][1] == "T" else 1)
         hdisk_dict[hdisk] = get_hdisk_id(size, tp)
-        print(hdisk + "\t" + str(size) + "\t" + tp + "\t" + str(hdisk_dict[hdisk]))
     return hdisk_dict
 
 def get_gcard_id(company, series, num):
@@ -157,21 +154,14 @@ def parse_label(raw_label):
         specs[name] = set([raw_label[asin][name] for asin in raw_label])
         # print("%s: %d" % (name, len(specs[name])))
 
-    # specs_parsed["screen"] = parse_screen_label(specs["screen"])
+    specs_parsed["screen"] = parse_screen_label(specs["screen"])
     specs_parsed["cpu"] = parse_cpu_label(specs["cpu"])
-    # specs_parsed["ram"] = parse_ram_label(specs["ram"])
-    # specs_parsed["hdisk"] = parse_hdisk_label(specs["hdisk"])
-    # specs_parsed["gcard"] = parse_gcard_label(specs["gcard"])
-    # with open(parsed_label_path, "w") as outfile:
-    #     json.dump(specs_parsed, outfile)
-    #     outfile.close()
-
-
-def debug(items):
-    pattern = "(\d+(?:\.\d+)?)"
-    for item in items:
-        result = re.findall(pattern, item)
-        print(result)
+    specs_parsed["ram"] = parse_ram_label(specs["ram"])
+    specs_parsed["hdisk"] = parse_hdisk_label(specs["hdisk"])
+    specs_parsed["gcard"] = parse_gcard_label(specs["gcard"])
+    with open(parsed_label_path, "w") as outfile:
+        json.dump(specs_parsed, outfile)
+        outfile.close()
 
 if __name__ == '__main__':
     raw_label = load_label()
