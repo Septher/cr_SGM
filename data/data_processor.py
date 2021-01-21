@@ -56,10 +56,12 @@ def clean_str(string):
 def clean_data(data):
     stop_words = set(stopwords.words('english'))
     for asin, docs in data.items():
+        _docs = []
         for doc in docs:
             words = nltk.word_tokenize(clean_str(doc))
             words = [word for word in words if re.search("\w", word) is not None and word not in stop_words]
-            data[asin] = words
+            _docs.append(words)
+        data[asin] = _docs
     return data
 
 if __name__ == '__main__':
