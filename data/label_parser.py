@@ -4,6 +4,7 @@ import pandas as pd
 
 def load_label():
     raw_label_path = "raw/labels for the laptop (specifications).xlsx"
+    label_dict_path = "processed/label_dict.json"
     df = pd.read_excel(raw_label_path, sheet_name="spec", engine="openpyxl")
     raw_label = dict()
     for index, asin in enumerate(df):
@@ -17,6 +18,9 @@ def load_label():
             "hdisk": str(spec[3]),
             "gcard": str(spec[4])
         }
+    with open(label_dict_path, "w") as outfile:
+        json.dump(raw_label, outfile)
+        outfile.close()
     return raw_label
 
 screen_quantile = [12, 13, 14, 16, 18]
@@ -148,9 +152,10 @@ def parse_gcard_label(raw_gcards):
     return gcard_dict
 
 def parse_label(raw_label):
+    devices = ["screen", "cpu", "ram", "hdisk", "gcard"]
     parsed_label_path = "processed/labels_parsed.json"
     specs, specs_parsed = dict(), dict()
-    for name in ["screen", "cpu", "ram", "hdisk", "gcard"]:
+    for name in devices:
         specs[name] = set([raw_label[asin][name] for asin in raw_label])
         # print("%s: %d" % (name, len(specs[name])))
 
@@ -159,8 +164,15 @@ def parse_label(raw_label):
     specs_parsed["ram"] = parse_ram_label(specs["ram"])
     specs_parsed["hdisk"] = parse_hdisk_label(specs["hdisk"])
     specs_parsed["gcard"] = parse_gcard_label(specs["gcard"])
+
+    # label to id
+    for asin, items in raw_label.items():
+        for device in devices:
+            name = items[device]
+            raw_label[asin][device] = specs_parsed[device][name]
+
     with open(parsed_label_path, "w") as outfile:
-        json.dump(specs_parsed, outfile)
+        json.dump(raw_label, outfile)
         outfile.close()
 
 if __name__ == '__main__':

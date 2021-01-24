@@ -1,184 +1,814 @@
 {
-  "screen": {
-    "10.1 inches": 0,
-    "12.5 inches": 1,
-    "17.3 inches": 4,
-    "19.5 inches": 5,
-    "14 inches": 3,
-    "13.5 inches": 2,
-    "15.6 inches": 3,
-    "13.3 inches": 2,
-    "11.6 inches": 0,
-    "12.3 inches": 1
+  "B07193JRJR": {
+    "screen": 3,
+    "cpu": 1,
+    "ram": 0,
+    "hdisk": 0,
+    "gcard": 4
   },
-  "cpu": {
-    "2.7 GHz Intel Core i7": 7,
-    "2.2 GHz Intel Core i3": 3,
-    "2.9 GHz Intel Celeron": 1,
-    "Celeron N3060 2 GHz": 1,
-    "2.5 GHz Athlon 2650e": 9,
-    "1.6 GHz AMD E Series": 0,
-    "Core i7 2.7 GHz": 9,
-    "2 GHz Celeron D Processor 360": 1,
-    "1.7 GHz Exynos 5000 Series": 9,
-    "2.4 GHz Intel Core i3": 4,
-    "AMD A9 3 GHz": 2,
-    "1.1 GHz Intel Celeron": 0,
-    "2 GHz AMD A Series": 1,
-    "1.8 GHz AMD E Series": 0,
-    "3.4 GHz Intel Core i5": 7,
-    "Intel Core I7 2.7 Ghz": 7,
-    "2.5 GHz Intel Core Duo": 9,
-    "2.1 GHz Intel Core i7": 7,
-    "3.6 GHz AMD A Series": 2,
-    "2.6 GHz Intel Core i5": 6,
-    "3.8 GHz Core i7 Family": 9,
-    "Intel Core i5 3.5 GHz": 7,
-    "1.6 GHz Intel Core i5": 5,
-    "2.3 GHz Intel Core i3": 3,
-    "Intel 2.2GHz": 9,
-    "1.6 GHz Celeron N3050": 0,
-    "2.5 GHz AMD A Series": 1,
-    "2.4 GHz Core i3-540": 9,
-    "3.8 GHz Intel Core i7": 8,
-    "2.7 GHz AMD A Series": 1,
-    "2.48 GHz Intel Celeron": 1,
-    "Intel Core i5 1.6 GHz": 5,
-    "2.5GHz AMD A6-9220": 1,
-    "3 GHz AMD A Series": 2,
-    "1.6 GHz Celeron N3060": 0,
-    "2.7 GHz Core i7 7500U": 9,
-    " Intel i7 1.8 GHz": 6,
-    "3.1 GHz Intel Core i5": 7,
-    "1.8 GHz Intel Core i7": 6,
-    "1.44 GHz Intel": 9,
-    "1.6 GHz Intel Mobile CPU": 9,
-    "Intel Core i7 2.8 GHz": 7,
-    "2.7 GHz Intel Core i3": 4,
-    "2.5 GHz Core i5 7200U": 9,
-    "AMD E2-6110 1.5 GHz": 0,
-    "Exynos 5250 1.7 GHz": 9,
-    "3.5 GHz Intel Core i5": 7,
-    "2.3 GHz Intel Core i5": 6,
-    "2.4 GHz AMD A Series": 1,
-    "2.2 GHz Intel Core i5": 6,
-    "1.1 GHz Pentium": 9,
-    "4 GHz Intel Core i7": 8,
-    "1.6 GHz Intel Core 2 Duo": 9,
-    "2.16 GHz Intel Celeron": 1,
-    "3.5 GHz Intel Core i7": 8,
-    "AMD A9-9420 3 GHz": 2,
-    "2.5 GHz Intel Core i5": 6,
-    "2.16 GHz Athlon 2650e": 9,
-    "2.8 GHz Intel Core i7": 7,
-    "2.5 GHz Pentium": 9,
-    "1.6 GHz Intel Celeron": 0
+  "B07BKNWVRT": {
+    "screen": 0,
+    "cpu": 6,
+    "ram": 0,
+    "hdisk": 2,
+    "gcard": 5
   },
-  "ram": {
-    "6 GB SDRAM": 1,
-    "4 GB SDRAM": 0,
-    "8 GB DDR4_SDRAM": 3,
-    "8 GB 2-in1 Media Card Reader, USB 3.1, Type-C": 2,
-    "8 GB DDR4": 3,
-    "2 GB SDRAM": 0,
-    "8 GB SDRAM DDR4": 3,
-    "16 GB DDR SDRAM": 5,
-    "12 GB DDR SDRAM": 4,
-    "8 GB SDRAM DDR3": 2,
-    "12 GB": 4,
-    "6 GB DDR SDRAM": 1,
-    "8 GB DDR4 2666MHz": 3,
-    "4 GB DDR3 SDRAM": 0,
-    "8 GB DDR SDRAM": 2,
-    "4 GB DDR3": 0,
-    "4 GB SDRAM DDR3": 0,
-    "4 GB DDR4": 0,
-    "4 GB LPDDR3_SDRAM": 0,
-    "8 GB SDRAM": 2,
-    "8 GB DDR4 SDRAM": 3,
-    "8 GB ddr4": 2,
-    "2 GB DDR3 SDRAM": 0,
-    "8 GB DDR3 SDRAM": 2,
-    "8 GB": 2,
-    "2 GB SDRAM DDR3": 0,
-    "8 GB LPDDR3": 2,
-    "2G flash_memory_solid_state": 0,
-    "2 GB DDR3L SDRAM": 0,
-    "6 GB": 1,
-    "16 GB SDRAM": 5,
-    "4 GB ddr3_sdram": 0,
-    "12 GB DDR4": 4,
-    "16 GB LPDDR3_SDRAM": 5,
-    "4 GB": 0,
-    "8 GB sdram": 2,
-    "16 GB DDR4": 5,
-    "4 GB DDR SDRAM": 0,
-    "4 GB SDRAM DDR4": 0,
-    "6 GB SDRAM DDR4": 1
+  "B07C89VH3J": {
+    "screen": 3,
+    "cpu": 6,
+    "ram": 2,
+    "hdisk": 8,
+    "gcard": 6
   },
-  "hdisk": {
-    "500 GB mechanical_hard_drive": 7,
-    "32 GB emmc": 1,
-    "32 GB Flash Memory Solid State": 1,
-    "512 GB SSD": 4,
-    "64 GB SSD": 2,
-    "1 TB": 8,
-    "64 GB Flash Memory Solid State": 2,
-    "128 GB SSD": 2,
-    "32 GB SSD": 1,
-    "256 GB Flash Memory Solid State": 3,
-    "1 TB HDD 7200 rpm": 8,
-    "1 TB serial_ata": 8,
-    "1000 GB Mechanical Hard Drive": 8,
-    "320 GB HDD 5400 rpm": 7,
-    "1 TB mechanical_hard_drive": 8,
-    "1024 GB Mechanical Hard Drive": 8,
-    "2 TB HDD 5400 rpm": 9,
-    "Solid State Drive, 512 GB": 4,
-    "16 GB SSD": 0,
-    "1 TB HDD 5400 rpm": 8,
-    "500 GB HDD 5400 rpm": 7,
-    "1128 GB Hybrid": 9,
-    "16 GB flash_memory_solid_state": 0,
-    "128 GB Flash Memory Solid State": 2,
-    "256 GB SSD": 3,
-    "1000 GB Hybrid Drive": 8
+  "B079QZ5DD7": {
+    "screen": 3,
+    "cpu": 2,
+    "ram": 3,
+    "hdisk": 3,
+    "gcard": 3
   },
-  "gcard": {
-    "Intel HD Graphics 5500": 5,
-    "FirePro W4190M": 7,
-    "Intel HD Graphics 505": 5,
-    "NVIDIA GeForce GTX 1050": 0,
-    "GTX 1050 Ti": 0,
-    "AMD Radeon R2": 2,
-    "Integrated": 4,
-    "GTX 1050": 0,
-    "Intel HD Graphics 400": 5,
-    "Intel UHD Graphics 620": 6,
-    "PC": 7,
-    "radeon r5": 3,
-    "NVIDIA GeForce GTX 1070": 0,
-    "Integrated Intel HD Graphics": 4,
-    "NVIDIA GeForce GTX 1060": 0,
-    "integrated AMD Radeon R5 Graphics": 3,
-    "AMD Radeon R7": 3,
-    "integrated Intel HD Graphics": 4,
-    "AMD Radeon R5": 3,
-    "Intel Iris Plus Graphics 640": 6,
-    "Integrated intel hd graphics": 4,
-    "integrated intel hd graphics": 4,
-    "Intel HD Graphics 500": 5,
-    "Intel Integrated Graphics": 4,
-    "Intel HD Graphics 620": 6,
-    "NVIDIA GeForce 940MX": 1,
-    "Intel HD graphics 620": 6,
-    "Intel HD Graphics": 4,
-    "NVIDIA GeForce GTX 1050 Ti": 0,
-    "Integrated Graphics": 4,
-    "AMD Radeon R5 Graphics": 3,
-    "AMD Radeon R4": 2,
-    "Intel HD Graphics 620 (up to 2.07 GB)": 6,
-    "Intel HD Graphics 520": 5,
-    "Intel HD Graphics 3000": 5
+  "B078WRSHV4": {
+    "screen": 3,
+    "cpu": 5,
+    "ram": 2,
+    "hdisk": 3,
+    "gcard": 6
+  },
+  "B07C8H76ST": {
+    "screen": 3,
+    "cpu": 1,
+    "ram": 0,
+    "hdisk": 7,
+    "gcard": 2
+  },
+  "B07C826G84": {
+    "screen": 3,
+    "cpu": 9,
+    "ram": 0,
+    "hdisk": 2,
+    "gcard": 5
+  },
+  "B0764HW117": {
+    "screen": 3,
+    "cpu": 7,
+    "ram": 2,
+    "hdisk": 8,
+    "gcard": 0
+  },
+  "B0721Y4BKP": {
+    "screen": 3,
+    "cpu": 7,
+    "ram": 2,
+    "hdisk": 8,
+    "gcard": 4
+  },
+  "B07879JVQ8": {
+    "screen": 0,
+    "cpu": 0,
+    "ram": 0,
+    "hdisk": 0,
+    "gcard": 5
+  },
+  "B01N6S4A2U": {
+    "screen": 4,
+    "cpu": 7,
+    "ram": 5,
+    "hdisk": 8,
+    "gcard": 0
+  },
+  "B0749DN9BN": {
+    "screen": 3,
+    "cpu": 1,
+    "ram": 0,
+    "hdisk": 7,
+    "gcard": 2
+  },
+  "B074VLX5XV": {
+    "screen": 3,
+    "cpu": 7,
+    "ram": 2,
+    "hdisk": 8,
+    "gcard": 0
+  },
+  "B07BVZRVPF": {
+    "screen": 3,
+    "cpu": 1,
+    "ram": 0,
+    "hdisk": 7,
+    "gcard": 2
+  },
+  "B077P7D2B2": {
+    "screen": 3,
+    "cpu": 5,
+    "ram": 2,
+    "hdisk": 9,
+    "gcard": 6
+  },
+  "B06XFGF7SN": {
+    "screen": 3,
+    "cpu": 9,
+    "ram": 3,
+    "hdisk": 8,
+    "gcard": 0
+  },
+  "B078JXMS8W": {
+    "screen": 3,
+    "cpu": 6,
+    "ram": 2,
+    "hdisk": 3,
+    "gcard": 6
+  },
+  "B074TXHFX4": {
+    "screen": 3,
+    "cpu": 7,
+    "ram": 3,
+    "hdisk": 8,
+    "gcard": 3
+  },
+  "B077YPSPQQ": {
+    "screen": 2,
+    "cpu": 6,
+    "ram": 3,
+    "hdisk": 3,
+    "gcard": 6
+  },
+  "B079L3CTSJ": {
+    "screen": 3,
+    "cpu": 9,
+    "ram": 0,
+    "hdisk": 2,
+    "gcard": 5
+  },
+  "B07C86S13K": {
+    "screen": 4,
+    "cpu": 2,
+    "ram": 2,
+    "hdisk": 8,
+    "gcard": 3
+  },
+  "B077XS11LS": {
+    "screen": 3,
+    "cpu": 6,
+    "ram": 3,
+    "hdisk": 8,
+    "gcard": 6
+  },
+  "B0788JTZFM": {
+    "screen": 3,
+    "cpu": 6,
+    "ram": 5,
+    "hdisk": 8,
+    "gcard": 0
+  },
+  "B07BQVMWG5": {
+    "screen": 3,
+    "cpu": 1,
+    "ram": 3,
+    "hdisk": 3,
+    "gcard": 2
+  },
+  "B071XSKHWV": {
+    "screen": 3,
+    "cpu": 4,
+    "ram": 1,
+    "hdisk": 8,
+    "gcard": 6
+  },
+  "B077RNJR5N": {
+    "screen": 5,
+    "cpu": 4,
+    "ram": 2,
+    "hdisk": 8,
+    "gcard": 6
+  },
+  "B0727VQLGM": {
+    "screen": 2,
+    "cpu": 7,
+    "ram": 2,
+    "hdisk": 3,
+    "gcard": 6
+  },
+  "B072MTXBLM": {
+    "screen": 4,
+    "cpu": 8,
+    "ram": 3,
+    "hdisk": 8,
+    "gcard": 0
+  },
+  "B077TLC1KQ": {
+    "screen": 3,
+    "cpu": 0,
+    "ram": 0,
+    "hdisk": 1,
+    "gcard": 4
+  },
+  "B075S6YTRS": {
+    "screen": 2,
+    "cpu": 8,
+    "ram": 2,
+    "hdisk": 3,
+    "gcard": 6
+  },
+  "B06XMQ82P4": {
+    "screen": 0,
+    "cpu": 9,
+    "ram": 0,
+    "hdisk": 2,
+    "gcard": 4
+  },
+  "B0785H4MT5": {
+    "screen": 3,
+    "cpu": 1,
+    "ram": 0,
+    "hdisk": 8,
+    "gcard": 5
+  },
+  "B073WQLZ7M": {
+    "screen": 3,
+    "cpu": 2,
+    "ram": 1,
+    "hdisk": 8,
+    "gcard": 7
+  },
+  "B078251NTK": {
+    "screen": 3,
+    "cpu": 0,
+    "ram": 0,
+    "hdisk": 8,
+    "gcard": 5
+  },
+  "B077PY4WH4": {
+    "screen": 3,
+    "cpu": 0,
+    "ram": 0,
+    "hdisk": 1,
+    "gcard": 4
+  },
+  "B01LZ6XKS6": {
+    "screen": 1,
+    "cpu": 1,
+    "ram": 0,
+    "hdisk": 1,
+    "gcard": 4
+  },
+  "B077RML4SK": {
+    "screen": 4,
+    "cpu": 4,
+    "ram": 2,
+    "hdisk": 9,
+    "gcard": 6
+  },
+  "B077P1CBYZ": {
+    "screen": 3,
+    "cpu": 5,
+    "ram": 4,
+    "hdisk": 9,
+    "gcard": 6
+  },
+  "B072N4D64S": {
+    "screen": 3,
+    "cpu": 6,
+    "ram": 2,
+    "hdisk": 3,
+    "gcard": 6
+  },
+  "B077RJD7TS": {
+    "screen": 4,
+    "cpu": 4,
+    "ram": 2,
+    "hdisk": 9,
+    "gcard": 6
+  },
+  "B07DP3K7KF": {
+    "screen": 3,
+    "cpu": 1,
+    "ram": 0,
+    "hdisk": 1,
+    "gcard": 7
+  },
+  "B077ZHV9WQ": {
+    "screen": 3,
+    "cpu": 0,
+    "ram": 0,
+    "hdisk": 8,
+    "gcard": 5
+  },
+  "B077ZLH5LC": {
+    "screen": 3,
+    "cpu": 0,
+    "ram": 0,
+    "hdisk": 8,
+    "gcard": 5
+  },
+  "B079TGL2BZ": {
+    "screen": 3,
+    "cpu": 3,
+    "ram": 1,
+    "hdisk": 8,
+    "gcard": 6
+  },
+  "B07192C4X4": {
+    "screen": 4,
+    "cpu": 3,
+    "ram": 2,
+    "hdisk": 8,
+    "gcard": 5
+  },
+  "B07B6BTZ5K": {
+    "screen": 0,
+    "cpu": 9,
+    "ram": 0,
+    "hdisk": 1,
+    "gcard": 4
+  },
+  "B077MMH1D8": {
+    "screen": 3,
+    "cpu": 0,
+    "ram": 0,
+    "hdisk": 7,
+    "gcard": 2
+  },
+  "B06XFG7157": {
+    "screen": 3,
+    "cpu": 7,
+    "ram": 3,
+    "hdisk": 8,
+    "gcard": 0
+  },
+  "B071JPYP1Z": {
+    "screen": 3,
+    "cpu": 7,
+    "ram": 2,
+    "hdisk": 8,
+    "gcard": 0
+  },
+  "B077RQSMSR": {
+    "screen": 4,
+    "cpu": 4,
+    "ram": 2,
+    "hdisk": 9,
+    "gcard": 6
+  },
+  "B074WFZJ1D": {
+    "screen": 3,
+    "cpu": 1,
+    "ram": 2,
+    "hdisk": 8,
+    "gcard": 3
+  },
+  "B077Y3VYC5": {
+    "screen": 4,
+    "cpu": 7,
+    "ram": 2,
+    "hdisk": 9,
+    "gcard": 6
+  },
+  "B071XTQDL6": {
+    "screen": 4,
+    "cpu": 6,
+    "ram": 1,
+    "hdisk": 8,
+    "gcard": 6
+  },
+  "B06XJJG4PD": {
+    "screen": 3,
+    "cpu": 9,
+    "ram": 2,
+    "hdisk": 8,
+    "gcard": 6
+  },
+  "B075TF3HT6": {
+    "screen": 0,
+    "cpu": 9,
+    "ram": 0,
+    "hdisk": 0,
+    "gcard": 5
+  },
+  "B07B5C855G": {
+    "screen": 3,
+    "cpu": 0,
+    "ram": 0,
+    "hdisk": 7,
+    "gcard": 4
+  },
+  "B07BKVHNPK": {
+    "screen": 3,
+    "cpu": 7,
+    "ram": 5,
+    "hdisk": 4,
+    "gcard": 0
+  },
+  "B078BQVGFV": {
+    "screen": 3,
+    "cpu": 6,
+    "ram": 2,
+    "hdisk": 8,
+    "gcard": 6
+  },
+  "B078X1J1BC": {
+    "screen": 3,
+    "cpu": 0,
+    "ram": 0,
+    "hdisk": 1,
+    "gcard": 4
+  },
+  "B078GMKCDS": {
+    "screen": 4,
+    "cpu": 2,
+    "ram": 1,
+    "hdisk": 8,
+    "gcard": 3
+  },
+  "B072J8ZNX6": {
+    "screen": 0,
+    "cpu": 0,
+    "ram": 0,
+    "hdisk": 0,
+    "gcard": 4
+  },
+  "B077TFZ323": {
+    "screen": 3,
+    "cpu": 6,
+    "ram": 3,
+    "hdisk": 8,
+    "gcard": 6
+  },
+  "B07116R1GY": {
+    "screen": 1,
+    "cpu": 7,
+    "ram": 2,
+    "hdisk": 3,
+    "gcard": 4
+  },
+  "B0746NCNSG": {
+    "screen": 3,
+    "cpu": 0,
+    "ram": 0,
+    "hdisk": 1,
+    "gcard": 5
+  },
+  "B0762PPGJJ": {
+    "screen": 3,
+    "cpu": 9,
+    "ram": 3,
+    "hdisk": 8,
+    "gcard": 1
+  },
+  "B01N12UBQO": {
+    "screen": 3,
+    "cpu": 0,
+    "ram": 0,
+    "hdisk": 1,
+    "gcard": 2
+  },
+  "B076BFW7VZ": {
+    "screen": 3,
+    "cpu": 0,
+    "ram": 0,
+    "hdisk": 1,
+    "gcard": 2
+  },
+  "B009LL9VDG": {
+    "screen": 0,
+    "cpu": 9,
+    "ram": 0,
+    "hdisk": 0,
+    "gcard": 4
+  },
+  "B0768M9KVY": {
+    "screen": 3,
+    "cpu": 6,
+    "ram": 5,
+    "hdisk": 4,
+    "gcard": 6
+  },
+  "B0072PTV2O": {
+    "screen": 3,
+    "cpu": 1,
+    "ram": 0,
+    "hdisk": 8,
+    "gcard": 5
+  },
+  "B077BL6GLH": {
+    "screen": 3,
+    "cpu": 9,
+    "ram": 0,
+    "hdisk": 2,
+    "gcard": 5
+  },
+  "B073R5TXB7": {
+    "screen": 3,
+    "cpu": 9,
+    "ram": 2,
+    "hdisk": 3,
+    "gcard": 6
+  },
+  "B06XD3QBLZ": {
+    "screen": 0,
+    "cpu": 9,
+    "ram": 0,
+    "hdisk": 0,
+    "gcard": 4
+  },
+  "B071K1Q8TK": {
+    "screen": 3,
+    "cpu": 8,
+    "ram": 3,
+    "hdisk": 8,
+    "gcard": 0
+  },
+  "B0752W6W4Q": {
+    "screen": 3,
+    "cpu": 5,
+    "ram": 2,
+    "hdisk": 3,
+    "gcard": 6
+  },
+  "B071CHYSL5": {
+    "screen": 4,
+    "cpu": 6,
+    "ram": 3,
+    "hdisk": 8,
+    "gcard": 6
+  },
+  "B0711DNBKX": {
+    "screen": 0,
+    "cpu": 9,
+    "ram": 0,
+    "hdisk": 1,
+    "gcard": 4
+  },
+  "B07BP9QG2J": {
+    "screen": 3,
+    "cpu": 6,
+    "ram": 3,
+    "hdisk": 8,
+    "gcard": 0
+  },
+  "B072FRYB5X": {
+    "screen": 4,
+    "cpu": 6,
+    "ram": 4,
+    "hdisk": 8,
+    "gcard": 6
+  },
+  "B078Y2XB1Y": {
+    "screen": 3,
+    "cpu": 9,
+    "ram": 0,
+    "hdisk": 2,
+    "gcard": 4
+  },
+  "B073W6J71R": {
+    "screen": 3,
+    "cpu": 4,
+    "ram": 2,
+    "hdisk": 8,
+    "gcard": 6
+  },
+  "B0072PYHEQ": {
+    "screen": 3,
+    "cpu": 0,
+    "ram": 0,
+    "hdisk": 7,
+    "gcard": 4
+  },
+  "B0795W86N3": {
+    "screen": 3,
+    "cpu": 7,
+    "ram": 3,
+    "hdisk": 8,
+    "gcard": 6
+  },
+  "B06XFGDD8P": {
+    "screen": 3,
+    "cpu": 7,
+    "ram": 3,
+    "hdisk": 3,
+    "gcard": 0
+  },
+  "B074M6P779": {
+    "screen": 3,
+    "cpu": 1,
+    "ram": 1,
+    "hdisk": 8,
+    "gcard": 3
+  },
+  "B07BNPJ824": {
+    "screen": 3,
+    "cpu": 8,
+    "ram": 5,
+    "hdisk": 3,
+    "gcard": 3
+  },
+  "B07CH6XDV9": {
+    "screen": 3,
+    "cpu": 6,
+    "ram": 2,
+    "hdisk": 9,
+    "gcard": 6
+  },
+  "B0794QQKC8": {
+    "screen": 4,
+    "cpu": 2,
+    "ram": 0,
+    "hdisk": 8,
+    "gcard": 3
+  },
+  "B077HQMRVH": {
+    "screen": 3,
+    "cpu": 9,
+    "ram": 1,
+    "hdisk": 8,
+    "gcard": 6
+  },
+  "B076QGSPY8": {
+    "screen": 4,
+    "cpu": 7,
+    "ram": 3,
+    "hdisk": 8,
+    "gcard": 0
+  },
+  "B07BPQJ9GN": {
+    "screen": 3,
+    "cpu": 4,
+    "ram": 0,
+    "hdisk": 2,
+    "gcard": 6
+  },
+  "B06XNP29BR": {
+    "screen": 3,
+    "cpu": 6,
+    "ram": 0,
+    "hdisk": 7,
+    "gcard": 5
+  },
+  "B077GBXBCM": {
+    "screen": 3,
+    "cpu": 9,
+    "ram": 0,
+    "hdisk": 7,
+    "gcard": 5
+  },
+  "B079XKBTTK": {
+    "screen": 3,
+    "cpu": 7,
+    "ram": 3,
+    "hdisk": 8,
+    "gcard": 6
+  },
+  "B0764LNTCZ": {
+    "screen": 2,
+    "cpu": 7,
+    "ram": 3,
+    "hdisk": 3,
+    "gcard": 6
+  },
+  "B0753NHZY7": {
+    "screen": 3,
+    "cpu": 7,
+    "ram": 5,
+    "hdisk": 8,
+    "gcard": 0
+  },
+  "B077QGHB4L": {
+    "screen": 3,
+    "cpu": 6,
+    "ram": 2,
+    "hdisk": 9,
+    "gcard": 6
+  },
+  "B078WSX4QL": {
+    "screen": 2,
+    "cpu": 5,
+    "ram": 2,
+    "hdisk": 3,
+    "gcard": 6
+  },
+  "B073QVTHZ6": {
+    "screen": 3,
+    "cpu": 7,
+    "ram": 3,
+    "hdisk": 8,
+    "gcard": 7
+  },
+  "B06X9K3BH5": {
+    "screen": 3,
+    "cpu": 9,
+    "ram": 2,
+    "hdisk": 8,
+    "gcard": 3
+  },
+  "B07FG1PXX9": {
+    "screen": 3,
+    "cpu": 6,
+    "ram": 4,
+    "hdisk": 2,
+    "gcard": 6
+  },
+  "B075QJDVHP": {
+    "screen": 3,
+    "cpu": 4,
+    "ram": 3,
+    "hdisk": 2,
+    "gcard": 6
+  },
+  "B0778DVNHH": {
+    "screen": 3,
+    "cpu": 9,
+    "ram": 3,
+    "hdisk": 9,
+    "gcard": 6
+  },
+  "B06X17KZMK": {
+    "screen": 3,
+    "cpu": 0,
+    "ram": 0,
+    "hdisk": 1,
+    "gcard": 5
+  },
+  "B0797KF5ZX": {
+    "screen": 3,
+    "cpu": 7,
+    "ram": 4,
+    "hdisk": 3,
+    "gcard": 1
+  },
+  "B077T47HST": {
+    "screen": 3,
+    "cpu": 0,
+    "ram": 0,
+    "hdisk": 8,
+    "gcard": 5
+  },
+  "B074Q54GSR": {
+    "screen": 3,
+    "cpu": 6,
+    "ram": 3,
+    "hdisk": 3,
+    "gcard": 0
+  },
+  "B07BLKT38D": {
+    "screen": 3,
+    "cpu": 1,
+    "ram": 3,
+    "hdisk": 8,
+    "gcard": 3
+  },
+  "B071X8PH9S": {
+    "screen": 0,
+    "cpu": 0,
+    "ram": 0,
+    "hdisk": 1,
+    "gcard": 5
+  },
+  "B0749JVRQ3": {
+    "screen": 3,
+    "cpu": 6,
+    "ram": 2,
+    "hdisk": 2,
+    "gcard": 5
+  },
+  "B077GF2VY8": {
+    "screen": 3,
+    "cpu": 7,
+    "ram": 3,
+    "hdisk": 8,
+    "gcard": 4
+  },
+  "B0788K4NSG": {
+    "screen": 3,
+    "cpu": 0,
+    "ram": 0,
+    "hdisk": 8,
+    "gcard": 5
+  },
+  "B06XD3LXXK": {
+    "screen": 3,
+    "cpu": 1,
+    "ram": 0,
+    "hdisk": 0,
+    "gcard": 5
+  },
+  "B075N1YHVK": {
+    "screen": 2,
+    "cpu": 5,
+    "ram": 2,
+    "hdisk": 3,
+    "gcard": 4
+  },
+  "B0798WT34S": {
+    "screen": 3,
+    "cpu": 1,
+    "ram": 5,
+    "hdisk": 8,
+    "gcard": 3
+  },
+  "B076FGKHWC": {
+    "screen": 3,
+    "cpu": 1,
+    "ram": 0,
+    "hdisk": 0,
+    "gcard": 4
   }
 }
