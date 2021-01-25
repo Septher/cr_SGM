@@ -2,6 +2,13 @@ import re
 import json
 import pandas as pd
 
+label_cnt = {
+    "cpu": 10,
+    "screen": 6,
+    "ram": 6,
+    "hdisk": 10,
+    "gcard": 8
+}
 def load_label():
     raw_label_path = "raw/labels for the laptop (specifications).xlsx"
     label_dict_path = "processed/label_dict.json"
@@ -24,6 +31,7 @@ def load_label():
     return raw_label
 
 screen_quantile = [12, 13, 14, 16, 18]
+# [0, 5]
 def get_screen_id(size):
     for id, quantile in enumerate(screen_quantile):
         if size < quantile:
@@ -41,6 +49,7 @@ def parse_screen_label(raw_screens):
         screen_dic[screen] = get_screen_id(float(size[0]))
     return screen_dic
 
+# [0, 9]
 def get_cpu_id(company, freq, gen):
     if company == "AMD" or gen == "CELERON":
         if freq < 2.0:
@@ -76,6 +85,7 @@ def parse_cpu_label(raw_cpus):
         cpu_dic[cpu] = get_cpu_id(company[0] if len(company) == 1 else None, float(freq[0]), gen[0] if len(gen) == 1 else None)
     return cpu_dic
 
+# [0, 5]
 def get_ram_id(size, gen):
     if size <= 4:
         return 0
@@ -128,6 +138,7 @@ def parse_hdisk_label(raw_hdisk):
         hdisk_dict[hdisk] = get_hdisk_id(size, tp)
     return hdisk_dict
 
+# [0, 7]
 def get_gcard_id(company, series, num):
     if company == "NVIDIA" or series == "GTX":
         return 0 if num is not None and int(num) >= 1000 else 1

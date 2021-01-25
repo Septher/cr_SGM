@@ -98,7 +98,7 @@ def tokenize(text):
 
 def to_dataset(prefix, fields):
     return data.TabularDataset.splits(
-        path='processed/', train='%s_train.tsv' % prefix,
+        path='../data/processed/', train='%s_train.tsv' % prefix,
         validation='%s_val.tsv' % prefix, test='%s_test.tsv' % prefix, format='tsv',
         fields=fields)
 
@@ -111,8 +111,9 @@ def data_prepare():
 
 
 # hyper params
-BATCH_SIZE = 16
-DEVICE = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+BATCH_SIZE = 32
+# DEVICE = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+DEVICE = "cpu"
 spacy_en = spacy.load("en_core_web_sm")
 TEXT = Field(sequential=True, tokenize=tokenize, lower=True, stop_words=set(stopwords.words('english')))
 LABEL = Field(sequential=False, use_vocab=False)
@@ -126,11 +127,11 @@ def get_data_iter():
     TEXT.build_vocab(review_train, vectors="glove.6B.100d")
 
     need_train_iter, need_val_iter, need_test_iter = data.Iterator.splits(
-        (need_train, need_val, need_test), sort_key=lambda x: len(x.Text),
+        (need_train, need_val, need_test), sort_key=lambda x: len(x.text),
         batch_sizes=(BATCH_SIZE, BATCH_SIZE, BATCH_SIZE), device=DEVICE)
 
     review_train_iter, review_val_iter, _ = data.Iterator.splits(
-        (need_train, need_val, need_test), sort_key=lambda x: len(x.Text),
+        (need_train, need_val, need_test), sort_key=lambda x: len(x.text),
         batch_sizes=(BATCH_SIZE, BATCH_SIZE, BATCH_SIZE), device=DEVICE)
 
     return review_train_iter, review_val_iter, need_train_iter, need_val_iter, need_test_iter
