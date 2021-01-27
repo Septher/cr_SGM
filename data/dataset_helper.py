@@ -1,7 +1,6 @@
 import json
 import spacy
 import re
-import torch
 import pandas as pd
 from nltk.corpus import stopwords
 from torchtext.data import Field
@@ -15,11 +14,11 @@ def load_label():
     return label
 
 # change the order of labels
-devices = ["screen", "cpu", "ram", "hdisk", "gcard"]
+devices_order = ["screen", "cpu", "ram", "hdisk", "gcard"]
 columns_name = ["text"]
-columns_name.extend(devices)
+columns_name.extend(devices_order)
 def label_permutation(label_dict):
-    return [label_dict[device] for device in devices]
+    return [label_dict[device] for device in devices_order]
 
 def load_review_data(label_dict):
     raw_review_data_path = "raw/amazon_reviews - IEEE.xlsx"
@@ -110,17 +109,13 @@ def data_prepare():
     dataset_split_and_save(needs_with_label, [0.6, 0.2, 0.2], "need")
 
 
-# hyper params
-BATCH_SIZE = 32
-# DEVICE = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-DEVICE = "cpu"
 spacy_en = spacy.load("en_core_web_sm")
 TEXT = Field(sequential=True, tokenize=tokenize, lower=True, stop_words=set(stopwords.words('english')))
 LABEL = Field(sequential=False, use_vocab=False)
 fields = [("text", TEXT)]
-fields.extend([(device, LABEL) for device in devices])
+fields.extend([(device, LABEL) for device in devices_order])
 
-def get_data_iter():
+def get_data_iter(BATCH_SIZE, DEVICE):
     need_train, need_val, need_test = to_dataset("need", fields)
     review_train, review_val, review_test = to_dataset("review", fields)
 

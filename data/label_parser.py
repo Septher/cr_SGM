@@ -186,6 +186,6 @@ def parse_label(raw_label):
         json.dump(raw_label, outfile)
         outfile.close()
 
-if __name__ == '__main__':
-    raw_label = load_label()
-    parse_label(raw_label)
+# if __name__ == '__main__':
+#     raw_label = load_label()
+#     parse_label(raw_label)
