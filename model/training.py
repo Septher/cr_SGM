@@ -1,6 +1,6 @@
 import torch
 import torch.nn as nn
-from data.dataset_helper import get_data_iter, TEXT, devices
+from data.dataset_helper import get_data_iter, TEXT, devices_order
 from model.SGM import Encoder, Decoder, Seq2Seq
 from model.evaluation import evaluate
 import torch.optim as optim
@@ -64,7 +64,7 @@ def train(model, data_iter, num_epochs, data_tag):
                 "gcard": batch.gcard.to(DEVICE)
             }
             outputs = model(samples)
-            task_loss = [criterion(outputs[index], task_dict[device]) for index, device in enumerate(devices)]
+            task_loss = [criterion(outputs[index], task_dict[device]) for index, device in enumerate(devices_order)]
             loss = sum(task_loss)
 
             optimizer.zero_grad()

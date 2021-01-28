@@ -30,12 +30,12 @@ def load_label():
         outfile.close()
     return raw_label
 
-screen_quantile = [12, 13, 14, 16, 18]
+screen_quantile = [12, 13, 15, 16, 18]
 # [0, 5]
 def get_screen_id(size):
-    for id, quantile in enumerate(screen_quantile):
+    for index, quantile in enumerate(screen_quantile):
         if size < quantile:
-            return id
+            return index
     return 5
 
 def parse_screen_label(raw_screens):
@@ -57,7 +57,7 @@ def get_cpu_id(company, freq, gen):
         if freq < 3.0:
             return 1
         return 2
-    if company == "INTEL" and  (gen is not None and gen[0] == "I"):
+    if company == "INTEL" and (gen is not None and gen[0] == "I"):
         if gen[1] == "3":
             return 3 if freq < 2.4 else 4
         if gen[1] == "5":
@@ -113,16 +113,17 @@ def parse_ram_label(raw_rams):
 SSD_quantile = [16, 32, 128, 256, 512]
 HDD_quantile = [256, 512, 1024]
 def get_hdisk_id(size, tp):
-    if tp == "SSD": #[0, 5]
-        for id, quantile in enumerate(SSD_quantile):
+    # SSD -> [0, 5]
+    if tp == "SSD":
+        for index, quantile in enumerate(SSD_quantile):
             if size <= quantile:
-                return id
+                return index
         return 5
-    else: #[6, 9]
-        for id, quantile in enumerate(HDD_quantile, 6):
-            if size <= quantile:
-                return id
-        return 9
+    # HDD -> [6, 9]
+    for index, quantile in enumerate(HDD_quantile, 6):
+        if size <= quantile:
+            return index
+    return 9
 
 def parse_hdisk_label(raw_hdisk):
     sz_pattern = "(\d+) (G|T)B?"
@@ -142,12 +143,12 @@ def parse_hdisk_label(raw_hdisk):
 def get_gcard_id(company, series, num):
     if company == "NVIDIA" or series == "GTX":
         return 0 if num is not None and int(num) >= 1000 else 1
-    if company == "AMD" or series == "RADEON":
-        return 2 if num is not None and int(num) <= 4 else 3
     if company == "INTEL" or series == "INTEGRATED":
         if num is None or series == "INTEGRATED":
             return 4
-        return 5 if int(num[0]) <= 5 else 6
+        return 2 if int(num[0]) <= 5 else 3
+    if company == "AMD" or series == "RADEON":
+        return 5 if num is not None and int(num) <= 4 else 6
     return 7
 
 def parse_gcard_label(raw_gcards):
@@ -186,6 +187,6 @@ def parse_label(raw_label):
         json.dump(raw_label, outfile)
         outfile.close()
 
-# if __name__ == '__main__':
-#     raw_label = load_label()
-#     parse_label(raw_label)
+if __name__ == '__main__':
+    raw_label = load_label()
+    parse_label(raw_label)
