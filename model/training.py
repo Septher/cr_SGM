@@ -4,6 +4,7 @@ from data.dataset_helper import get_data_iter, TEXT, devices_order
 from model.SGM import Encoder, Decoder, Seq2Seq
 from model.evaluation import evaluate
 import torch.optim as optim
+from model.utils import load_checkpoint, save_checkpoint
 
 # training hyper parameters
 BATCH_SIZE = 32
@@ -24,8 +25,7 @@ WORD_EMBEDDING_SIZE = 100 # GLOVE 6B 100d
 TASK_EMBEDDING_SIZE = 128
 DROP_OUT_DE = 0.0
 
-review_train_iter, review_val_iter, \
-need_train_iter, need_val_iter, need_test_iter = get_data_iter(BATCH_SIZE, DEVICE)
+review_train_iter, review_val_iter, need_train_iter, need_val_iter, need_test_iter = get_data_iter(BATCH_SIZE, DEVICE)
 
 encoder = Encoder(
     embedding_size=WORD_EMBEDDING_SIZE,
@@ -47,9 +47,9 @@ pad_idx = TEXT.vocab.stoi["<pad>"]
 criterion = nn.CrossEntropyLoss(ignore_index=pad_idx)
 
 # if load_model:
-#     load_checkpoint(torch.load("my_checkpoint.pth.tar"), model, optimizer)
+#     load_checkpoint(torch.load("review_checkpoint.pth.tar"), seq2seq, optimizer)
 
-def train(model, data_iter, num_epochs, data_tag):
+def train(model, optimizer, data_iter, num_epochs, data_tag):
     model.train()
     for epoch in range(num_epochs):
         print(f"[{data_tag} Epoch {epoch} / {num_epochs}]")
@@ -71,6 +71,12 @@ def train(model, data_iter, num_epochs, data_tag):
             loss.backward()
             # torch.nn.utils.clip_grad_norm_(model.parameters(), max_norm=1)
             optimizer.step()
+    checkpoint = {
+        "state_dict": model.state_dict(),
+        "optimizer": optimizer.state_dict()
+    }
+    save_checkpoint(checkpoint, data_tag)
+
 
 def test(model, data_iter, data_tag):
     model.eval()
@@ -89,6 +95,6 @@ def test(model, data_iter, data_tag):
     evaluate(output_with_label, data_tag)
     model.train()
 
-train(seq2seq, review_train_iter, REVIEW_NUM_EPOCHS, "review")
-train(seq2seq, need_train_iter, NEED_NUM_EPOCHS, "need")
+train(seq2seq, optimizer, review_train_iter, REVIEW_NUM_EPOCHS, "review")
+# train(seq2seq, need_train_iter, NEED_NUM_EPOCHS, "need")
 
