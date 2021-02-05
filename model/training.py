@@ -1,5 +1,4 @@
 import sys
-#sys.path.append('/home/mlu/code/cr_SGM')
 import torch
 import torch.nn as nn
 from data.dataset_helper import get_data_iter, TEXT, devices_order
@@ -9,10 +8,11 @@ import torch.optim as optim
 import time
 from model.utils import load_checkpoint, save_checkpoint, save_data_to_csv
 
+sys.path.append('/home/mlu/code/cr_SGM')
 # training hyper parameters
 BATCH_SIZE = 32
-REVIEW_NUM_EPOCHS = 5
-NEED_NUM_EPOCHS = 5
+REVIEW_NUM_EPOCHS = 50
+NEED_NUM_EPOCHS = 10
 LEARNING_RATE = 3e-4
 DEVICE = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 load_model = False
@@ -82,7 +82,7 @@ def train(model, optimizer, train_iter, test_iter, num_epochs, data_tag):
         test_dict = test(model, test_iter, data_tag)
         for device in devices_order:
             for k in range(1, 6):
-                draw_points.append((data_tag, device, epoch, epoch_loss, k, test_dict[device]["recall@%d" % k]))
+                draw_points.append((data_tag, device, epoch, epoch_loss.item(), k, test_dict[device]["recall@%d" % k]))
         print("epoch: {}, epoch_loss: {:.6f}, top1_test_recall_sum: {:.3f}".format(epoch + 1, epoch_loss, sum([test_dict[device]["recall@1"] for device in devices_order])))
     cost = int(time.time() - start_stamp)
     print("training time cost: {} min {} sec".format(int(cost / 60), cost % 60))
@@ -91,8 +91,7 @@ def train(model, optimizer, train_iter, test_iter, num_epochs, data_tag):
         "optimizer": optimizer.state_dict()
     }
     save_checkpoint(checkpoint, data_tag)
-    save_data_to_csv(draw_points, columns=["tag", "device", "epoch", "loss", "k", "recall"])
-
+    return draw_points
 
 def test(model, data_iter, data_tag):
     model.eval()
@@ -112,6 +111,9 @@ def test(model, data_iter, data_tag):
     model.train()
     return test_dict
 
-train(seq2seq, optimizer, review_train_iter, review_val_iter, REVIEW_NUM_EPOCHS, "review")
-# train(seq2seq, need_train_iter, need_val_iter, NEED_NUM_EPOCHS, "need")
-# test(seq2seq, need_test_iter, "need")
+review_points = train(seq2seq, optimizer, review_train_iter, review_val_iter, REVIEW_NUM_EPOCHS, "review")
+need_points = train(seq2seq, optimizer, need_train_iter, need_val_iter, NEED_NUM_EPOCHS, "need")
+test(seq2seq, need_test_iter, "need")
+
+review_points.extend(need_points)
+save_data_to_csv(review_points, columns=["tag", "device", "epoch", "loss", "k", "recall"])
