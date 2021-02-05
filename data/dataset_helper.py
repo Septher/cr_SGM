@@ -119,7 +119,7 @@ def get_data_iter(BATCH_SIZE, DEVICE):
     need_train, need_val, need_test = to_dataset("need", fields)
     review_train, review_val, review_test = to_dataset("review", fields)
 
-    TEXT.build_vocab(review_train, vectors="glove.6B.100d")
+    TEXT.build_vocab(review_train, vectors="glove.6B.200d")
 
     need_train_iter, need_val_iter, need_test_iter = data.Iterator.splits(
         (need_train, need_val, need_test), sort_key=lambda x: len(x.text),
