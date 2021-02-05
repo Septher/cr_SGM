@@ -123,11 +123,11 @@ def get_data_iter(BATCH_SIZE, DEVICE):
 
     need_train_iter, need_val_iter, need_test_iter = data.Iterator.splits(
         (need_train, need_val, need_test), sort_key=lambda x: len(x.text),
-        batch_sizes=(BATCH_SIZE, BATCH_SIZE, BATCH_SIZE), device=DEVICE)
+        batch_sizes=(BATCH_SIZE, BATCH_SIZE, BATCH_SIZE), device=DEVICE, shuffle=True)
 
     review_train_iter, review_val_iter, _ = data.Iterator.splits(
         (review_train, review_val, review_test), sort_key=lambda x: len(x.text),
-        batch_sizes=(BATCH_SIZE, BATCH_SIZE, BATCH_SIZE), device=DEVICE)
+        batch_sizes=(BATCH_SIZE, BATCH_SIZE, BATCH_SIZE), device=DEVICE, shuffle=True)
 
     return review_train_iter, review_val_iter, need_train_iter, need_val_iter, need_test_iter
 
