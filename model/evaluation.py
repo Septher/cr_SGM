@@ -22,7 +22,7 @@ def recall(output_zip_label, k, data_tag):
         sample_cnt += batch_size
         for i in range(batch_size):
             _, top_k_index = torch.topk(output[i], k=k)
-            top_k_set = set(top_k_index.int().numpy())
+            top_k_set = set(top_k_index.cpu().int().numpy())
             if label.int() in top_k_set:
                 tp += 1
             else:

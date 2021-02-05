@@ -1,9 +1,12 @@
+import sys
+#sys.path.append('/home/mlu/code/cr_SGM')
 import torch
 import torch.nn as nn
 from data.dataset_helper import get_data_iter, TEXT, devices_order
 from model.SGM import Encoder, Decoder, Seq2Seq
 from model.evaluation import evaluate
 import torch.optim as optim
+import time
 from model.utils import load_checkpoint, save_checkpoint, save_data_to_csv
 
 # training hyper parameters
@@ -52,6 +55,7 @@ criterion = nn.CrossEntropyLoss(ignore_index=pad_idx)
 def train(model, optimizer, train_iter, test_iter, num_epochs, data_tag):
     model.train()
     draw_points = []
+    start_stamp = time.time()
     for epoch in range(num_epochs):
         epoch_loss = 0.0
         print(f"[{data_tag} Epoch {epoch} / {num_epochs}]")
@@ -80,7 +84,8 @@ def train(model, optimizer, train_iter, test_iter, num_epochs, data_tag):
             for k in range(1, 6):
                 draw_points.append((data_tag, device, epoch, epoch_loss, k, test_dict[device]["recall@%d" % k]))
         print("epoch: {}, epoch_loss: {:.6f}, top1_test_recall_sum: {:.3f}".format(epoch + 1, epoch_loss, sum([test_dict[device]["recall@1"] for device in devices_order])))
-
+    cost = int(time.time() - start_stamp)
+    print("training time cost: {} min {} sec".format(int(cost / 60), cost % 60))
     checkpoint = {
         "state_dict": model.state_dict(),
         "optimizer": optimizer.state_dict()
