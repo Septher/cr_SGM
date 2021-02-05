@@ -28,9 +28,9 @@ def recall(output_zip_label, k, data_tag):
             else:
                 fn += 1
 
-    recall = 1.0 * tp / (tp + fn)
-    print("%s recall@%d: %.4f" % (data_tag, k, recall))
-    return recall
+    r = 1.0 * tp / (tp + fn)
+    print("%s recall@%d: %.4f" % (data_tag, k, r))
+    return r
 
 def nDCG(output_zip_label, k, data_tag):
     return 0
