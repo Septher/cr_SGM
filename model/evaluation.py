@@ -9,7 +9,7 @@ def evaluate(output_with_label, data_tag):
         device_dict = dict()
         for k in range(1, 6):
             # device_dict["precision@%d" % k] = precision(output_zip_label, k, data_tag)
-            device_dict["reacll@%d" % k] = recall(output_zip_label, k, data_tag)
+            device_dict["recall@%d" % k] = recall(output_zip_label, k, data_tag)
             # device_dict["nDCG@%d" % k] = nDCG(output_zip_label, k, data_tag)
         result[device] = device_dict
     return result
