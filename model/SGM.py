@@ -18,7 +18,7 @@ class Encoder(nn.Module):
         self.cell_fc = nn.Linear(hidden_size * num_layers * 2, hidden_size)
 
     def forward(self, x):
-        batch_size = x.shape[0]
+        batch_size = x.shape[1]
         # x -> (seq_len, batch_size)
         embedding = self.embed(x)
         # embedding -> (seq_len, batch_size, embedding_size)
