@@ -23,12 +23,9 @@ class Encoder(nn.Module):
         embedding = self.embed(x)
         # embedding -> (seq_len, batch_size, embedding_size)
         encoder_states, (hidden, cell) = self.lstm(embedding)
-        # hidden and cell of the last layer
-        hidden = hidden.view(self.num_layers, 2, batch_size, self.hidden_size)[-1]
-        cell = cell.view(self.num_layers, 2, batch_size, self.hidden_size)[-1]
 
-        hidden = self.hidden_fc(torch.cat((hidden[0:1], hidden[1:2]), dim=2))
-        cell = self.cell_fc(torch.cat((cell[0:1], cell[1:2]), dim=2))
+        hidden = self.hidden_fc(torch.cat([hidden[i: i + 1] for i in range(self.num_layers * 2)], dim=2))
+        cell = self.cell_fc(torch.cat([cell[i: i + 1] for i in range(self.num_layers * 2)], dim=2))
         # encoder_state -> (seq_len, batch_size, hidden_size * num_layers * 2)
         # cell, hidden -> (batch_size, hidden_size)
         return encoder_states, hidden, cell
