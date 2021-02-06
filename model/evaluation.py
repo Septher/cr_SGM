@@ -8,8 +8,8 @@ def evaluate(output_with_label, data_tag):
     result = dict()
     for index, device in enumerate(devices_order):
         # output_zip_label = [(output[index], label_dict[device]) for output, label_dict in output_with_label]
-        outputs = torch.cat([output[index] for output, _ in output_with_label], dim=1)
-        labels = torch.cat([label_dict[device] for _, label_dict in output_with_label], dim=1)
+        outputs = torch.cat([output[index] for output, _ in output_with_label], dim=0)
+        labels = torch.cat([label_dict[device] for _, label_dict in output_with_label], dim=0)
         result[device] = calculate(outputs, labels)
     show_result(result, data_tag)
     return result
@@ -31,7 +31,7 @@ def calculate(outputs, labels):
         # recall@k = (number of top_k contains label) / sample_cnt
         out["recall@%d" % (k + 1)] = 1.0 * tp[k] / sample_cnt
         # precision@k = (number of top_k contains label) / (sample_cnt * k)
-        out["precision@%d" % (k + 1)] = 1.0 * tp[k] / sample_cnt / k
+        out["precision@%d" % (k + 1)] = 1.0 * tp[k] / sample_cnt / (k + 1)
         # nDCG: iDCG = 1 because there are only one label for each sample
         out["nDCG@%d" % (k + 1)] = _DCG[k]
     return out
