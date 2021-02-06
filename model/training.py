@@ -19,7 +19,7 @@ load_model = False
 save_model = True
 
 # model hyper parameters
-HIDDEN_SIZE = 512
+HIDDEN_SIZE = 256
 NUM_LAYERS = 1
 # encoder
 DROP_OUT_EN = 0.5
