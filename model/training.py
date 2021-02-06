@@ -22,11 +22,11 @@ save_model = True
 HIDDEN_SIZE = 512
 NUM_LAYERS = 1
 # encoder
-DROP_OUT_EN = 0.0
+DROP_OUT_EN = 0.5
 WORD_EMBEDDING_SIZE = 200 # GLOVE 6B 200d
 # decoder
 TASK_EMBEDDING_SIZE = 128
-DROP_OUT_DE = 0.0
+DROP_OUT_DE = 0.5
 
 review_train_iter, review_val_iter, need_train_iter, need_val_iter, need_test_iter = get_data_iter(BATCH_SIZE, DEVICE)
 
@@ -94,6 +94,7 @@ def train(model, optimizer, train_iter, test_iter, num_epochs, data_tag):
     cost = int(time.time() - start_stamp)
     print("training time cost: {} min {} sec".format(int(cost / 60), cost % 60))
     save_checkpoint(checkpoint, data_tag)
+    load_checkpoint(checkpoint, model, optimizer)
     return draw_points
 
 def test(model, data_iter, data_tag):
