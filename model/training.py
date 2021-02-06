@@ -56,8 +56,9 @@ def train(model, optimizer, train_iter, test_iter, num_epochs, data_tag):
     model.train()
     draw_points = []
     start_stamp = time.time()
+    min_test_loss, checkpoint = 0.0, dict()
     for epoch in range(num_epochs):
-        epoch_loss = 0.0
+        training_loss = 0.0
         print(f"[{data_tag} Epoch {epoch} / {num_epochs}]")
 
         for batch_index, batch in enumerate(train_iter, 1):
@@ -72,30 +73,33 @@ def train(model, optimizer, train_iter, test_iter, num_epochs, data_tag):
             outputs = model(samples)
             task_loss = [criterion(outputs[index], task_dict[device]) for index, device in enumerate(devices_order)]
             loss = sum(task_loss)
-            epoch_loss += loss
+            training_loss += loss
 
             optimizer.zero_grad()
             loss.backward()
             # torch.nn.utils.clip_grad_norm_(model.parameters(), max_norm=1)
             optimizer.step()
 
-        test_dict = test(model, test_iter, data_tag)
-        for device in devices_order:
-            for k in range(1, 6):
-                draw_points.append((data_tag, device, epoch, epoch_loss.item(), k, test_dict[device]["recall@%d" % k]))
-        print("epoch: {}, epoch_loss: {:.6f}, top1_test_recall_ave: {:.3f}".format(epoch + 1, epoch_loss, sum([test_dict[device]["recall@1"] for device in devices_order]) / 5))
+        test_loss = test(model, test_iter, data_tag)
+        if epoch == 0 or min_test_loss > test_loss:
+            min_test_loss = test_loss
+            checkpoint = {
+                "state_dict": model.state_dict(),
+                "optimizer": optimizer.state_dict()
+            }
+        # for device in devices_order:
+        #     for k in range(1, 6):
+        #         draw_points.append((data_tag, device, epoch, epoch_loss.item(), k, test_dict[device]["recall@%d" % k]))
+        print("epoch: {}, training_loss: {:.6f}, test_loss: {:.6f}".format(epoch + 1, training_loss, test_loss))
     cost = int(time.time() - start_stamp)
     print("training time cost: {} min {} sec".format(int(cost / 60), cost % 60))
-    checkpoint = {
-        "state_dict": model.state_dict(),
-        "optimizer": optimizer.state_dict()
-    }
     save_checkpoint(checkpoint, data_tag)
     return draw_points
 
 def test(model, data_iter, data_tag):
     model.eval()
     output_with_label = []
+    test_loss = 0.0
     for batch_index, batch in enumerate(data_iter):
         samples = batch.text.to(DEVICE)
         task_dict = {
@@ -107,9 +111,13 @@ def test(model, data_iter, data_tag):
         }
         outputs = model(samples)
         output_with_label.append((outputs, task_dict))
-    test_dict = evaluate(output_with_label, data_tag)
+        task_loss = [criterion(outputs[index], task_dict[device]) for index, device in enumerate(devices_order)]
+        loss = sum(task_loss)
+        test_loss += loss
+
+    evaluate(output_with_label, data_tag)
     model.train()
-    return test_dict
+    return test_loss
 
 review_points = train(seq2seq, optimizer, review_train_iter, review_val_iter, REVIEW_NUM_EPOCHS, "review")
 need_points = train(seq2seq, optimizer, need_train_iter, need_val_iter, NEED_NUM_EPOCHS, "need")
