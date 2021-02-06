@@ -20,7 +20,7 @@ save_model = True
 
 # model hyper parameters
 HIDDEN_SIZE = 256
-NUM_LAYERS = 1
+NUM_LAYERS = 2
 # encoder
 DROP_OUT_EN = 0.5
 WORD_EMBEDDING_SIZE = 200 # GLOVE 6B 200d
