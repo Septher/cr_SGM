@@ -18,10 +18,15 @@ class Encoder(nn.Module):
         self.cell_fc = nn.Linear(hidden_size * num_layers * 2, hidden_size)
 
     def forward(self, x):
+        batch_size = x.shape[0]
         # x -> (seq_len, batch_size)
         embedding = self.embed(x)
         # embedding -> (seq_len, batch_size, embedding_size)
         encoder_states, (hidden, cell) = self.lstm(embedding)
+        # hidden and cell of the last layer
+        hidden = hidden.view(self.num_layers, 2, batch_size, self.hidden_size)[-1]
+        cell = cell.view(self.num_layers, 2, batch_size, self.hidden_size)[-1]
+
         hidden = self.hidden_fc(torch.cat((hidden[0:1], hidden[1:2]), dim=2))
         cell = self.cell_fc(torch.cat((cell[0:1], cell[1:2]), dim=2))
         # encoder_state -> (seq_len, batch_size, hidden_size * num_layers * 2)
