@@ -14,8 +14,8 @@ class Encoder(nn.Module):
         self.embed = nn.Embedding(len(vocab), embedding_size)
         self.embed.weight.data.copy_(vocab.vectors)
         self.lstm = nn.LSTM(embedding_size, hidden_size, num_layers, dropout=p, bidirectional=True)
-        self.hidden_fc = nn.Linear(hidden_size * num_layers * 2, hidden_size) # reduce hidden dimension
-        self.cell_fc = nn.Linear(hidden_size * num_layers * 2, hidden_size)
+        self.hidden_fc = nn.Linear(hidden_size * 2, hidden_size) # reduce hidden dimension
+        self.cell_fc = nn.Linear(hidden_size * 2, hidden_size)
 
     def forward(self, x):
         batch_size = x.shape[1]
@@ -23,11 +23,11 @@ class Encoder(nn.Module):
         embedding = self.embed(x)
         # embedding -> (seq_len, batch_size, embedding_size)
         encoder_states, (hidden, cell) = self.lstm(embedding)
-        hiddens = [torch.cat((hidden[i * 2: i * 2 + 1], hidden[i * 2 + 1, i * 2 + 2]), dim=2) for i in range(self.num_layers)]
-        cells = [torch.cat((cell[i * 2: i * 2 + 1], cell[i * 2 + 1, i * 2 + 2]), dim=2) for i in range(self.num_layers)]
+        hiddens = [torch.cat((hidden[i * 2: i * 2 + 1], hidden[i * 2 + 1: i * 2 + 2]), dim=2) for i in range(self.num_layers)]
+        cells = [torch.cat((cell[i * 2: i * 2 + 1], cell[i * 2 + 1: i * 2 + 2]), dim=2) for i in range(self.num_layers)]
         hidden = self.hidden_fc(torch.cat(hiddens, dim=0))
         cell = self.cell_fc(torch.cat(cells, dim=0))
-        # encoder_state -> (seq_len, batch_size, hidden_size * num_layers * 2)
+        # encoder_state -> (seq_len, batch_size, hidden_size * num_directions)
         # cell, hidden -> (1, batch_size, hidden_size)
         return encoder_states, hidden, cell
 
@@ -75,7 +75,7 @@ class Decoder(nn.Module):
         # (1, batch_size, embedding_size)
 
         seq_len = encoder_states.shape[0]
-        h_reshaped = hidden.repeat(seq_len, 1, 1)
+        h_reshaped = hidden[-1].repeat(seq_len, 1, 1)
         # (seq_len, batch_size, hidden_size)
 
         energy = self.relu(self.energy(torch.cat((h_reshaped, encoder_states), dim=2)))
