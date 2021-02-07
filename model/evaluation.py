@@ -21,7 +21,6 @@ def calculate(outputs, labels):
         actual = labels[i].item()
         _, indices = torch.sort(outputs[i], descending=True)
         rk = torch.where(indices == actual, torch.ones_like(indices), torch.zeros_like(indices)).nonzero()[0].item()
-        print(indices, actual, rk)
         for k in range(K):
             if rk <= k:
                 tp[k] += 1
