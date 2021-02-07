@@ -80,7 +80,7 @@ def train(model, optimizer, train_iter, val_iter, num_epochs, data_tag, points):
             optimizer.step()
 
         val_loss, val_result = test(model, val_iter, data_tag)
-        if epoch == 0 or min_test_loss > val_loss:
+        if data_tag == "need" and (epoch == 0 or min_test_loss > val_loss):
             min_test_loss = val_loss
             checkpoint = {
                 "state_dict": model.state_dict(),

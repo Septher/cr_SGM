@@ -20,11 +20,12 @@ def calculate(outputs, labels):
     for i in range(sample_cnt):
         actual = labels[i].item()
         _, indices = torch.sort(outputs[i], descending=True)
-        pos = torch.where(indices == actual, indices + 1, torch.zeros_like(indices)).max().item() - 1
+        rk = torch.where(indices == actual, torch.ones_like(indices), torch.zeros_like(indices)).nonzero()[0].item()
+        print(indices, actual, rk)
         for k in range(K):
-            if pos <= k:
+            if rk <= k:
                 tp[k] += 1
-                _DCG[k] += log2[pos]
+                _DCG[k] += log2[rk]
     out = dict()
     for k in range(K):
         # recall@k = (number of top_k contains label) / sample_cnt
@@ -32,11 +33,11 @@ def calculate(outputs, labels):
         # precision@k = (number of top_k contains label) / (sample_cnt * k)
         out["precision@%d" % (k + 1)] = 1.0 * tp[k] / sample_cnt / (k + 1)
         # nDCG: iDCG = 1 because there are only one label for each sample
-        out["nDCG@%d" % (k + 1)] = _DCG[k]
+        out["nDCG@%d" % (k + 1)] = _DCG[k] / sample_cnt
     return out
 
 def show_result(result, data_tag):
     print("%s training result: " % data_tag)
     for device in devices_order:
-        for criterion in ["recall", "precision", "nDCG"]:
+        for criterion in ["recall"]:
             print("%s %s: %s" % (device, criterion, str(["%.4f" % result[device]["%s@%d" % (criterion, k + 1)] for k in range(K)])))
