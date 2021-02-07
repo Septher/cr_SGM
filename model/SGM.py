@@ -23,11 +23,12 @@ class Encoder(nn.Module):
         embedding = self.embed(x)
         # embedding -> (seq_len, batch_size, embedding_size)
         encoder_states, (hidden, cell) = self.lstm(embedding)
-
-        hidden = self.hidden_fc(torch.cat([hidden[i: i + 1] for i in range(self.num_layers * 2)], dim=2))
-        cell = self.cell_fc(torch.cat([cell[i: i + 1] for i in range(self.num_layers * 2)], dim=2))
+        hiddens = [torch.cat((hidden[i * 2: i * 2 + 1], hidden[i * 2 + 1, i * 2 + 2]), dim=2) for i in range(self.num_layers)]
+        cells = [torch.cat((cell[i * 2: i * 2 + 1], cell[i * 2 + 1, i * 2 + 2]), dim=2) for i in range(self.num_layers)]
+        hidden = self.hidden_fc(torch.cat(hiddens, dim=0))
+        cell = self.cell_fc(torch.cat(cells, dim=0))
         # encoder_state -> (seq_len, batch_size, hidden_size * num_layers * 2)
-        # cell, hidden -> (batch_size, hidden_size)
+        # cell, hidden -> (1, batch_size, hidden_size)
         return encoder_states, hidden, cell
 
 class Decoder(nn.Module):
