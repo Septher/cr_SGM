@@ -7,7 +7,6 @@ K = 5
 def evaluate(output_with_label, data_tag):
     result = dict()
     for index, device in enumerate(devices_order):
-        # output_zip_label = [(output[index], label_dict[device]) for output, label_dict in output_with_label]
         outputs = torch.cat([output[index] for output, _ in output_with_label], dim=0)
         labels = torch.cat([label_dict[device] for _, label_dict in output_with_label], dim=0)
         result[device] = calculate(outputs, labels)
@@ -39,5 +38,5 @@ def calculate(outputs, labels):
 def show_result(result, data_tag):
     print("%s training result: " % data_tag)
     for device in devices_order:
-        for criterion in ["recall"]:
+        for criterion in ["recall", "precision", "nDCG"]:
             print("%s %s: %s" % (device, criterion, str(["%.4f" % result[device]["%s@%d" % (criterion, k + 1)] for k in range(K)])))

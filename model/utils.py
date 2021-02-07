@@ -42,3 +42,6 @@ loss_data_path = "loss.csv"
 def save_data_to_csv(draw_points, columns, save_file=loss_data_path):
     points = DataFrame(data=draw_points, columns=columns)
     points.to_csv(save_file)
+
+def show_result(input_file, baseline_file):
+    return
