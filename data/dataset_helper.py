@@ -105,8 +105,8 @@ def data_prepare():
     label = load_label()
     reviews_with_label = load_review_data(label)
     needs_with_label = load_needs_data(label)
-    dataset_split_and_save(reviews_with_label, [0.8, 0.2, 0.0], "review")
-    dataset_split_and_save(needs_with_label, [0.6, 0.2, 0.2], "need")
+    dataset_split_and_save(reviews_with_label, [0.9, 0.1, 0.0], "review")
+    dataset_split_and_save(needs_with_label, [0.7, 0.15, 0.15], "need")
 
 
 spacy_en = spacy.load("en_core_web_sm")
@@ -131,6 +131,5 @@ def get_data_iter(BATCH_SIZE, DEVICE):
 
     return review_train_iter, review_val_iter, need_train_iter, need_val_iter, need_test_iter
 
-# if __name__ == '__main__':
-#     # data_prepare()
+# data_prepare()
 #     get_data_iter()

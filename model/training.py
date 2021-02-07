@@ -11,8 +11,8 @@ from model.utils import load_checkpoint, save_checkpoint, save_data_to_csv
 
 # training hyper parameters
 BATCH_SIZE = 32
-REVIEW_NUM_EPOCHS = 50
-NEED_NUM_EPOCHS = 50
+REVIEW_NUM_EPOCHS = 20
+NEED_NUM_EPOCHS = 100
 LEARNING_RATE = 3e-4
 DEVICE = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 load_model = False
@@ -55,7 +55,7 @@ criterion = nn.CrossEntropyLoss(ignore_index=pad_idx)
 def train(model, optimizer, train_iter, val_iter, num_epochs, data_tag, points):
     model.train()
     start_stamp = time.time()
-    min_test_loss, checkpoint = 0.0, dict()
+    min_test_loss, checkpoint = 0.0, None
     for epoch in range(num_epochs):
         training_loss = 0.0
         print(f"[{data_tag} Epoch {epoch} / {num_epochs}]")
@@ -80,7 +80,7 @@ def train(model, optimizer, train_iter, val_iter, num_epochs, data_tag, points):
             optimizer.step()
 
         val_loss, val_result = test(model, val_iter, data_tag)
-        if data_tag == "need" and (epoch == 0 or min_test_loss > val_loss):
+        if data_tag == "need" and epoch > 5 and (checkpoint is None or min_test_loss > val_loss):
             min_test_loss = val_loss
             checkpoint = {
                 "state_dict": model.state_dict(),
