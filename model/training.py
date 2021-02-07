@@ -103,7 +103,7 @@ def train(model, optimizer, train_iter, val_iter, num_epochs, data_tag, points):
             "state_dict": model.state_dict(),
             "optimizer": optimizer.state_dict()
         }
-        save_checkpoint(checkpoint, data_tag)
+        save_checkpoint(checkpoint, "%d_%s_review" % (REVIEW_NUM_EPOCHS, "no_clip"))
 
 def test(model, data_iter, data_tag):
     model.eval()
