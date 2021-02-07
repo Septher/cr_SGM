@@ -105,8 +105,8 @@ def data_prepare():
     label = load_label()
     reviews_with_label = load_review_data(label)
     needs_with_label = load_needs_data(label)
-    dataset_split_and_save(reviews_with_label, [0.9, 0.1, 0.0], "review")
-    dataset_split_and_save(needs_with_label, [0.7, 0.15, 0.15], "need")
+    dataset_split_and_save(reviews_with_label, [0.95, 0.05, 0.0], "review")
+    dataset_split_and_save(needs_with_label, [0.65, 0.15, 0.2], "need")
 
 
 spacy_en = spacy.load("en_core_web_sm")
