@@ -14,7 +14,7 @@ def load_label():
     return label
 
 # change the order of labels
-devices_order = ["screen", "cpu", "ram", "hdisk", "gcard"]
+devices_order = ["screen", "hdisk", "gcard", "ram", "cpu"]
 columns_name = ["text"]
 columns_name.extend(devices_order)
 def label_permutation(label_dict):
