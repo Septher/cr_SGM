@@ -55,7 +55,7 @@ criterion = nn.CrossEntropyLoss(ignore_index=pad_idx)
 def train(model, optimizer, train_iter, val_iter, num_epochs, data_tag, points):
     model.train()
     start_stamp = time.time()
-    min_test_loss, checkpoint = 0.0, None
+    min_val_loss, checkpoint, best_epoch = 0.0, None, -1
     for epoch in range(num_epochs):
         training_loss = 0.0
         print(f"[{data_tag} Epoch {epoch} / {num_epochs}]")
@@ -81,7 +81,8 @@ def train(model, optimizer, train_iter, val_iter, num_epochs, data_tag, points):
 
         val_loss, val_result = test(model, val_iter, data_tag)
         if data_tag == "need" and epoch > 5 and (checkpoint is None or min_test_loss > val_loss):
-            min_test_loss = val_loss
+            min_val_loss = val_loss
+            best_epoch = epoch
             checkpoint = {
                 "state_dict": model.state_dict(),
                 "optimizer": optimizer.state_dict()
@@ -98,6 +99,7 @@ def train(model, optimizer, train_iter, val_iter, num_epochs, data_tag, points):
     if data_tag == "need":
         save_checkpoint(checkpoint, data_tag)
         load_checkpoint(checkpoint, model, optimizer)
+        print("best epoch: %d, min val loss: %d" % (best_epoch, min_val_loss))
     else:
         checkpoint = {
             "state_dict": model.state_dict(),
