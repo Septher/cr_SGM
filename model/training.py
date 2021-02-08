@@ -49,8 +49,8 @@ optimizer = optim.Adam(seq2seq.parameters(), lr=LEARNING_RATE)
 pad_idx = TEXT.vocab.stoi["<pad>"]
 criterion = nn.CrossEntropyLoss(ignore_index=pad_idx)
 
-# if load_model:
-#     load_checkpoint(torch.load("review_checkpoint.pth.tar"), seq2seq, optimizer)
+if load_model:
+    load_checkpoint(torch.load("50_no_clip_review_checkpoint.pth.tar"), seq2seq, optimizer)
 
 def train(model, optimizer, train_iter, val_iter, num_epochs, data_tag, points):
     model.train()
@@ -80,7 +80,7 @@ def train(model, optimizer, train_iter, val_iter, num_epochs, data_tag, points):
             optimizer.step()
 
         val_loss, val_result = test(model, val_iter, data_tag)
-        if data_tag == "need" and epoch > 5 and (checkpoint is None or min_test_loss > val_loss):
+        if data_tag == "need" and epoch > 20 and (checkpoint is None or min_val_loss > val_loss):
             min_val_loss = val_loss
             best_epoch = epoch
             checkpoint = {

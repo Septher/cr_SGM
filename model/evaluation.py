@@ -37,6 +37,9 @@ def calculate(outputs, labels):
 
 def show_result(result, data_tag):
     print("%s training result: " % data_tag)
+    recall_ave = 0.0
     for device in devices_order:
         for criterion in ["recall"]:
             print("%s %s: %s" % (device, criterion, str(["%.4f" % result[device]["%s@%d" % (criterion, k + 1)] for k in range(K)])))
+        recall_ave += sum([result[device]["recall@%d" % (k + 1)] for k in range(K)])
+    print("recall ave = %.4f" % (recall_ave / 25))
