@@ -11,22 +11,22 @@ from model.utils import load_checkpoint, save_checkpoint, save_data_to_csv
 
 # training hyper parameters
 BATCH_SIZE = 32
-REVIEW_NUM_EPOCHS = 20
-NEED_NUM_EPOCHS = 100
+REVIEW_NUM_EPOCHS = 50
+NEED_NUM_EPOCHS = 50
 LEARNING_RATE = 3e-4
 DEVICE = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 load_model = False
 save_model = True
 
 # model hyper parameters
-HIDDEN_SIZE = 256
-NUM_LAYERS = 2
+HIDDEN_SIZE = 512
+NUM_LAYERS = 1
 # encoder
-DROP_OUT_EN = 0.5
+DROP_OUT_EN = 0.0
 WORD_EMBEDDING_SIZE = 200 # GLOVE 6B 200d
 # decoder
 TASK_EMBEDDING_SIZE = 128
-DROP_OUT_DE = 0.5
+DROP_OUT_DE = 0.0
 
 review_train_iter, review_val_iter, need_train_iter, need_val_iter, need_test_iter = get_data_iter(BATCH_SIZE, DEVICE)
 
@@ -90,7 +90,7 @@ def train(model, optimizer, train_iter, val_iter, num_epochs, data_tag, points):
         for device in devices_order:
             for k in range(1, 6):
                 for c in ["recall", "precision", "nDCG"]:
-                    points.append((data_tag, device, epoch, training_loss.item(), k, val_result[device]["%s@%d" % (c, k)]))
+                    points.append((data_tag, device, epoch, training_loss.item(), val_loss.item(), val_result[device]["%s@%d" % (c, k)]))
         print("epoch: {}, training_loss: {:.6f}, val_loss: {:.6f}".format(epoch + 1, training_loss, val_loss))
     cost = int(time.time() - start_stamp)
     print("training time cost: {} min {} sec".format(int(cost / 60), cost % 60))
@@ -133,4 +133,4 @@ train(seq2seq, optimizer, review_train_iter, review_val_iter, REVIEW_NUM_EPOCHS,
 train(seq2seq, optimizer, need_train_iter, need_val_iter, NEED_NUM_EPOCHS, "need", draw_points)
 test(seq2seq, need_test_iter, "need")
 
-save_data_to_csv(draw_points, columns=["tag", "device", "epoch", "loss", "k", "score"])
+save_data_to_csv(draw_points, columns=["tag", "device", "epoch", "training_loss", "val_loss", "score"])
