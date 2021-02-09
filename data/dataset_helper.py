@@ -14,9 +14,10 @@ def load_label():
     return label
 
 # change the order of labels
-devices_order = ["screen", "cpu", "ram", "hdisk", "gcard"]
+devices_order = ["screen", "hdisk", "gcard", "ram", "cpu"]
+devices_order_data = ["screen", "cpu", "ram", "hdisk", "gcard"]
 columns_name = ["text"]
-columns_name.extend(devices_order)
+columns_name.extend(devices_order_data)
 def label_permutation(label_dict):
     return [label_dict[device] for device in devices_order]
 
@@ -75,7 +76,7 @@ def clean_str(string):
 
 def save_as_tsv(df, file_name):
     path = "processed/%s" % file_name
-    df.to_csv(path, sep='\t', index=False, header=True)
+    df.to_csv(path, sep='\t', index=False, header=False)
 
 # review data -> 80% train 20% val
 # need data -> 60% train 20% val 20% test
@@ -113,7 +114,7 @@ spacy_en = spacy.load("en_core_web_sm")
 TEXT = Field(sequential=True, tokenize=tokenize, lower=True, stop_words=set(stopwords.words('english')))
 LABEL = Field(sequential=False, use_vocab=False)
 fields = [("text", TEXT)]
-fields.extend([(device, LABEL) for device in devices_order])
+fields.extend([(device, LABEL) for device in devices_order_data])
 
 def get_data_iter(BATCH_SIZE, DEVICE):
     need_train, need_val, need_test = to_dataset("need", fields)
