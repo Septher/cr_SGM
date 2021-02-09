@@ -75,7 +75,7 @@ def clean_str(string):
 
 def save_as_tsv(df, file_name):
     path = "processed/%s" % file_name
-    df.to_csv(path, sep='\t', index=False, header=False)
+    df.to_csv(path, sep='\t', index=False, header=True)
 
 # review data -> 80% train 20% val
 # need data -> 60% train 20% val 20% test
