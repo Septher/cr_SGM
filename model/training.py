@@ -56,7 +56,7 @@ def train(model, optimizer, train_iter, val_iter, num_epochs, data_tag, points):
     model.train()
     start_stamp = time.time()
     min_val_loss, checkpoint, best_steps = 0.0, None, -1
-    steps = 0
+    steps, steps_cut = 0, (50 if data_tag == "review" else 10)
     for epoch in range(num_epochs):
         training_loss = 0.0
         print(f"[{data_tag} Epoch {epoch} / {num_epochs}]")
@@ -80,7 +80,7 @@ def train(model, optimizer, train_iter, val_iter, num_epochs, data_tag, points):
             # torch.nn.utils.clip_grad_norm_(model.parameters(), max_norm=1)
             optimizer.step()
             steps += 1
-            if steps % 50 == 0:
+            if steps % steps_cut == 0:
                 val_loss, val_result = test(model, val_iter, data_tag)
                 if checkpoint is None or min_val_loss > val_loss:
                     min_val_loss = val_loss
