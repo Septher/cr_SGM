@@ -11,8 +11,8 @@ from model.utils import load_checkpoint, save_checkpoint, save_data_to_csv
 
 # training hyper parameters
 BATCH_SIZE = 32
-REVIEW_NUM_EPOCHS = 50
-NEED_NUM_EPOCHS = 50
+REVIEW_NUM_EPOCHS = 15
+NEED_NUM_EPOCHS = 15
 LEARNING_RATE = 3e-4
 DEVICE = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 load_model = False
@@ -94,7 +94,7 @@ def train(model, optimizer, train_iter, val_iter, num_epochs, data_tag, points):
                         for c in ["recall", "precision", "nDCG"]:
                             points.append((data_tag, device, epoch, steps, training_loss.item(), val_loss.item(), val_result[device]["%s@%d" % (c, k)]))
 
-                print("epoch: {}, training_loss: {:.6f}, val_loss: {:.6f}".format(epoch + 1, training_loss, val_loss))
+                print("steps: {}, training_loss: {:.6f}, val_loss: {:.6f}".format(steps, training_loss, val_loss))
     cost = int(time.time() - start_stamp)
     print("training time cost: {} min {} sec".format(int(cost / 60), cost % 60))
     # choose the model with min val loss
