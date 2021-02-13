@@ -75,7 +75,7 @@ class Decoder(nn.Module):
         # (1, batch_size, embedding_size)
 
         seq_len = encoder_states.shape[0]
-        h_reshaped = hidden.repeat(seq_len, 1, 1)
+        h_reshaped = hidden[-1].repeat(seq_len, 1, 1)
         # (seq_len, batch_size, hidden_size)
 
         energy = self.relu(self.energy(torch.cat((h_reshaped, encoder_states), dim=2)))
