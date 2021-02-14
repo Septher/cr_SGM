@@ -105,7 +105,7 @@ class Seq2Seq(nn.Module):
         encoder_states, hidden, cell = self.encoder(samples)
         outputs = []
         prev_task = "init"
-        x = torch.zeros((batch_size, 1), device=device)
+        x = torch.zeros(batch_size, device=device, dtype=torch.int64)
         for t, task in enumerate(devices_order):
             output, hidden, cell = self.decoder(x, encoder_states, hidden, cell, prev_task, task)
             x = output.argmax(1)
