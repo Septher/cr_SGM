@@ -14,21 +14,23 @@ class Encoder(nn.Module):
         self.embed = nn.Embedding(len(vocab), embedding_size)
         self.embed.weight.data.copy_(vocab.vectors)
         self.lstm = nn.LSTM(embedding_size, hidden_size, num_layers, dropout=p, bidirectional=True)
-        self.hidden_fc = nn.Linear(hidden_size * 2, hidden_size) # reduce hidden dimension
-        self.cell_fc = nn.Linear(hidden_size * 2, hidden_size)
+        self.hidden_fc = nn.Linear(hidden_size * num_layers * 2, hidden_size) # reduce hidden dimension
+        self.cell_fc = nn.Linear(hidden_size * num_layers * 2, hidden_size)
 
     def forward(self, x):
-        batch_size = x.shape[1]
-        # x -> (seq_len, batch_size)
+        # index -> (seq_len, batch_size)
         embedding = self.embed(x)
-        # embedding -> (seq_len, batch_size, embedding_size)
+        # embedding -> (seq_len, batch, embedding_size)
         encoder_states, (hidden, cell) = self.lstm(embedding)
-        hiddens = [torch.cat((hidden[i * 2: i * 2 + 1], hidden[i * 2 + 1: i * 2 + 2]), dim=2) for i in range(self.num_layers)]
-        cells = [torch.cat((cell[i * 2: i * 2 + 1], cell[i * 2 + 1: i * 2 + 2]), dim=2) for i in range(self.num_layers)]
-        hidden = self.hidden_fc(torch.cat(hiddens, dim=0))
-        cell = self.cell_fc(torch.cat(cells, dim=0))
-        # encoder_state -> (seq_len, batch_size, hidden_size * num_directions)
-        # cell, hidden -> (1, batch_size, hidden_size)
+        # (num_layers * num_dir, batch, hidden_size) -> (1, batch, hidden_size * num_dir * num_layers)
+        hidden = torch.cat([hidden[i: i + 1] for i in range(self.num_layers * 2)], dim=2)
+        cell = torch.cat([cell[i: i + 1] for i in range(self.num_layers * 2)], dim=2)
+        # hidden = torch.cat([torch.cat((hidden[i * 2: i * 2 + 1], hidden[i * 2 + 1: i * 2 + 2]), dim=2) for i in range(self.num_layers)], dim=2)
+        # cell = torch.cat([torch.cat((cell[i * 2: i * 2 + 1], cell[i * 2 + 1: i * 2 + 2]), dim=2) for i in range(self.num_layers)], dim=2)
+        hidden = self.hidden_fc(hidden)
+        cell = self.cell_fc(cell)
+        # encoder_state -> (seq_len, batch, hidden_size * num_dir)
+        # cell, hidden -> (1, batch, hidden_size)
         return encoder_states, hidden, cell
 
 class Decoder(nn.Module):
@@ -51,12 +53,12 @@ class Decoder(nn.Module):
             "hdisk": self.hdk_classifier,
             "gcard": self.gcd_classifier
         }
-        self.ini_embedding = nn.Linear(1, embedding_size)
-        self.scr_embedding = nn.Linear(6, embedding_size)
-        self.cpu_embedding = nn.Linear(10, embedding_size)
-        self.ram_embedding = nn.Linear(6, embedding_size)
-        self.hdk_embedding = nn.Linear(10, embedding_size)
-        self.gcd_embedding = nn.Linear(8, embedding_size)
+        self.ini_embedding = nn.Embedding(1, embedding_size)
+        self.scr_embedding = nn.Embedding(6, embedding_size)
+        self.cpu_embedding = nn.Embedding(10, embedding_size)
+        self.ram_embedding = nn.Embedding(6, embedding_size)
+        self.hdk_embedding = nn.Embedding(10, embedding_size)
+        self.gcd_embedding = nn.Embedding(8, embedding_size)
         self.task_embedding = {
             "init": self.ini_embedding,
             "screen": self.scr_embedding,
@@ -69,25 +71,26 @@ class Decoder(nn.Module):
     # hidden and cell are from previous time step of decoder for t > 1.
     # for t = 1, they are from the last step of encoder
     def forward(self, x, encoder_states, hidden, cell, input_task, cur_task):
-        # add a dimension for seq_len, x -> (1, batch_size, 1)
-        x = x.unsqueeze(0)
-        embedding = self.task_embedding[input_task](x)
-        # (1, batch_size, embedding_size)
-
         seq_len = encoder_states.shape[0]
+        # (1, batch, hidden_size) -> (seq_len, batch, hidden_size)
         h_reshaped = hidden[-1].repeat(seq_len, 1, 1)
-        # (seq_len, batch_size, hidden_size)
 
+        # (seq_len, batch, hidden_size + hidden_size * 2) -> (seq_len, batch, 1)
         energy = self.relu(self.energy(torch.cat((h_reshaped, encoder_states), dim=2)))
-        # (seq_len, batch_size, 1)
-        attention = self.softmax(energy)
-        context_vector = torch.einsum("snk,snl->knl", attention, encoder_states)
-        # (1, batch_size, hidden_size * 2)
-        input_lstm = torch.cat((context_vector, embedding), dim=2)
-        # (1, batch_size, hidden_size * 2 + task_embedding_size)
+        attention_score = self.softmax(energy)
+        # (seq_len, batch, 1) * (seq_len, batch, hidden_size * num_dir) -> (1, batch, hidden_size * num_dir)
+        context_vector = torch.einsum("snk,snl->knl", attention_score, encoder_states)
 
+        # add a dimension as seq_len
+        x = x.unsqueeze(0)
+        # index -> (1, batch, embedding_size)
+        embedding = self.task_embedding[input_task](x)
+        # (1, batch, hidden_size * 2 + task_embedding_size)
+        input_lstm = torch.cat((context_vector, embedding), dim=2)
+
+        # output -> (1, batch, hidden_size)
         output, (hidden, cell) = self.lstm(input_lstm, (hidden, cell))
-        # output -> (1, batch_size, hidden_size)
+        # prediction -> (batch, task_class_num)
         predictions = self.classifier[cur_task](output).squeeze(0)
         return predictions, hidden, cell
 
@@ -98,16 +101,15 @@ class Seq2Seq(nn.Module):
         self.decoder = decoder
 
     def forward(self, samples):
-        batch_size = samples.shape[1]
-        device = samples.device
+        batch_size, device = samples.shape[1], samples.device
         encoder_states, hidden, cell = self.encoder(samples)
         outputs = []
         prev_task = "init"
-        x = torch.zeros((batch_size, 1), device=device)
+        x = torch.zeros(batch_size, device=device, dtype=torch.int64)
         for t, task in enumerate(devices_order):
             output, hidden, cell = self.decoder(x, encoder_states, hidden, cell, prev_task, task)
             x = output.argmax(1)
-            x = self.to_one_hot(x, task, device)
+            # x = self.to_one_hot(x, task, device)
             outputs.append(output)
             prev_task = task
         return outputs

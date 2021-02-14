@@ -15,8 +15,9 @@ def load_label():
 
 # change the order of labels
 devices_order = ["screen", "hdisk", "gcard", "ram", "cpu"]
+devices_order_data = ["screen", "cpu", "ram", "hdisk", "gcard"]
 columns_name = ["text"]
-columns_name.extend(devices_order)
+columns_name.extend(devices_order_data)
 def label_permutation(label_dict):
     return [label_dict[device] for device in devices_order]
 
@@ -113,7 +114,7 @@ spacy_en = spacy.load("en_core_web_sm")
 TEXT = Field(sequential=True, tokenize=tokenize, lower=True, stop_words=set(stopwords.words('english')))
 LABEL = Field(sequential=False, use_vocab=False)
 fields = [("text", TEXT)]
-fields.extend([(device, LABEL) for device in devices_order])
+fields.extend([(device, LABEL) for device in devices_order_data])
 
 def get_data_iter(BATCH_SIZE, DEVICE):
     need_train, need_val, need_test = to_dataset("need", fields)

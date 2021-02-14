@@ -8,7 +8,6 @@ def save_checkpoint(state, file_prefix, file_suffix="checkpoint.pth.tar"):
     print("=> Saving checkpoint")
     torch.save(state, file_prefix + "_" + file_suffix)
 
-
 def load_checkpoint(checkpoint, model, optimizer):  # , steps):
     print("=> Loading checkpoint")
     model.load_state_dict(checkpoint["state_dict"])
@@ -43,5 +42,20 @@ def save_data_to_csv(draw_points, columns, save_file=loss_data_path):
     points = DataFrame(data=draw_points, columns=columns)
     points.to_csv(save_file)
 
-def show_result(input_file, baseline_file):
-    return
+def show_result():
+    df = pd.read_csv(loss_data_path, index_col=0)
+    # training loss and val loss during training
+    show_loss(df.loc[df["tag"] == "need"])
+    show_loss(df.loc[df["tag"] == "review"])
+
+
+def show_loss(df):
+    df = df[["tag", "epoch", "training_loss", "val_loss"]]
+    training_loss = df[["tag", "epoch", "training_loss"]].rename(columns={"training_loss": "loss"})
+    training_loss["description"] = "training"
+    val_loss = df[["tag", "epoch", "val_loss"]].rename(columns={"val_loss": "loss"})
+    val_loss["description"] = "validation"
+    output = pd.concat([training_loss, val_loss])
+    sns.set_theme()
+    sns.lineplot(data=output, x="steps", y="loss", hue="description")
+    plt.show()
