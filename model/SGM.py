@@ -23,8 +23,8 @@ class Encoder(nn.Module):
         # embedding -> (seq_len, batch, embedding_size)
         encoder_states, (hidden, cell) = self.lstm(embedding)
         # (num_layers * num_dir, batch, hidden_size) -> (1, batch, hidden_size * num_dir * num_layers)
-        hidden = torch.cat([hidden[i] for i in range(self.num_layers * 2)], dim=2)
-        cell = torch.cat([cell[i] for i in range(self.num_layers * 2)], dim=2)
+        hidden = torch.cat([hidden[i: i + 1] for i in range(self.num_layers * 2)], dim=2)
+        cell = torch.cat([cell[i: i + 1] for i in range(self.num_layers * 2)], dim=2)
         # hidden = torch.cat([torch.cat((hidden[i * 2: i * 2 + 1], hidden[i * 2 + 1: i * 2 + 2]), dim=2) for i in range(self.num_layers)], dim=2)
         # cell = torch.cat([torch.cat((cell[i * 2: i * 2 + 1], cell[i * 2 + 1: i * 2 + 2]), dim=2) for i in range(self.num_layers)], dim=2)
         hidden = self.hidden_fc(hidden)
@@ -53,12 +53,12 @@ class Decoder(nn.Module):
             "hdisk": self.hdk_classifier,
             "gcard": self.gcd_classifier
         }
-        self.ini_embedding = nn.Linear(1, embedding_size)
-        self.scr_embedding = nn.Linear(6, embedding_size)
-        self.cpu_embedding = nn.Linear(10, embedding_size)
-        self.ram_embedding = nn.Linear(6, embedding_size)
-        self.hdk_embedding = nn.Linear(10, embedding_size)
-        self.gcd_embedding = nn.Linear(8, embedding_size)
+        self.ini_embedding = nn.Embedding(1, embedding_size)
+        self.scr_embedding = nn.Embedding(6, embedding_size)
+        self.cpu_embedding = nn.Embedding(10, embedding_size)
+        self.ram_embedding = nn.Embedding(6, embedding_size)
+        self.hdk_embedding = nn.Embedding(10, embedding_size)
+        self.gcd_embedding = nn.Embedding(8, embedding_size)
         self.task_embedding = {
             "init": self.ini_embedding,
             "screen": self.scr_embedding,
