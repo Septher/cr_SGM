@@ -5,6 +5,7 @@ import pandas as pd
 from nltk.corpus import stopwords
 from torchtext.data import Field
 from torchtext import data
+from model.params import BATCH_SIZE_REVIEW, BATCH_SIZE_NEED, DEVICE
 
 def load_label():
     label_path = "processed/labels_parsed.json"
@@ -116,7 +117,7 @@ LABEL = Field(sequential=False, use_vocab=False)
 fields = [("text", TEXT)]
 fields.extend([(device, LABEL) for device in devices_order_data])
 
-def get_data_iter(BATCH_SIZE, DEVICE):
+def get_data_iter():
     need_train, need_val, need_test = to_dataset("need", fields)
     review_train, review_val, review_test = to_dataset("review", fields)
 
@@ -124,13 +125,13 @@ def get_data_iter(BATCH_SIZE, DEVICE):
 
     need_train_iter, need_val_iter, need_test_iter = data.Iterator.splits(
         (need_train, need_val, need_test), sort_key=lambda x: len(x.text),
-        batch_sizes=(BATCH_SIZE, BATCH_SIZE, BATCH_SIZE), device=DEVICE, shuffle=True)
+        batch_sizes=(BATCH_SIZE_REVIEW, BATCH_SIZE_REVIEW, BATCH_SIZE_REVIEW), device=DEVICE, shuffle=True)
 
     review_train_iter, review_val_iter, _ = data.Iterator.splits(
         (review_train, review_val, review_test), sort_key=lambda x: len(x.text),
-        batch_sizes=(BATCH_SIZE, BATCH_SIZE, BATCH_SIZE), device=DEVICE, shuffle=True)
+        batch_sizes=(BATCH_SIZE_NEED, BATCH_SIZE_NEED, BATCH_SIZE_NEED), device=DEVICE, shuffle=True)
 
     return review_train_iter, review_val_iter, need_train_iter, need_val_iter, need_test_iter
 
-# data_prepare()
+data_prepare()
 #     get_data_iter()

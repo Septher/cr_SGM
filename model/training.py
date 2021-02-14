@@ -8,27 +8,9 @@ from model.evaluation import evaluate
 import torch.optim as optim
 import time
 from model.utils import load_checkpoint, save_checkpoint, save_data_to_csv
+from model.params import DEVICE, WORD_EMBEDDING_SIZE, HIDDEN_SIZE, NUM_LAYERS, DROP_OUT_EN, DROP_OUT_DE, TASK_EMBEDDING_SIZE, LEARNING_RATE, load_model, save_model, REVIEW_NUM_EPOCHS, NEED_NUM_EPOCHS
 
-# training hyper parameters
-BATCH_SIZE = 32
-REVIEW_NUM_EPOCHS = 15
-NEED_NUM_EPOCHS = 15
-LEARNING_RATE = 3e-4
-DEVICE = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-load_model = False
-save_model = True
-
-# model hyper parameters
-HIDDEN_SIZE = 512
-NUM_LAYERS = 1
-# encoder
-DROP_OUT_EN = 0.0
-WORD_EMBEDDING_SIZE = 200 # GLOVE 6B 200d
-# decoder
-TASK_EMBEDDING_SIZE = 128
-DROP_OUT_DE = 0.0
-
-review_train_iter, review_val_iter, need_train_iter, need_val_iter, need_test_iter = get_data_iter(BATCH_SIZE, DEVICE)
+review_train_iter, review_val_iter, need_train_iter, need_val_iter, need_test_iter = get_data_iter()
 
 encoder = Encoder(
     embedding_size=WORD_EMBEDDING_SIZE,
