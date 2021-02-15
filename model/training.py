@@ -38,9 +38,9 @@ def train(model, optimizer, train_iter, val_iter, num_epochs, data_tag, points):
     model.train()
     start_stamp = time.time()
     min_val_loss, checkpoint, best_steps = 0.0, None, -1
-    steps, steps_cut = 0, (50 if data_tag == "review" else 10)
+    steps, steps_cut = 0, (50 if data_tag == "review" else 15)
     for epoch in range(num_epochs):
-        training_loss = 0.0
+        training_loss, sample_cnt = 0.0, 0
         print(f"[{data_tag} Epoch {epoch} / {num_epochs}]")
 
         for batch_index, batch in enumerate(train_iter, 1):
@@ -56,10 +56,11 @@ def train(model, optimizer, train_iter, val_iter, num_epochs, data_tag, points):
             task_loss = [criterion(outputs[index], task_dict[device]) for index, device in enumerate(devices_order)]
             loss = sum(task_loss)
             training_loss += loss
+            sample_cnt += outputs[0].shape[0]
 
             optimizer.zero_grad()
             loss.backward()
-            # torch.nn.utils.clip_grad_norm_(model.parameters(), max_norm=1)
+            torch.nn.utils.clip_grad_norm_(model.parameters(), max_norm=1)
             optimizer.step()
             steps += 1
             if steps % steps_cut == 0:
@@ -74,9 +75,9 @@ def train(model, optimizer, train_iter, val_iter, num_epochs, data_tag, points):
                 for device in devices_order:
                     for k in range(1, 6):
                         for c in ["recall", "precision", "nDCG"]:
-                            points.append((data_tag, device, epoch, steps, training_loss.item(), val_loss.item(), val_result[device]["%s@%d" % (c, k)]))
+                            points.append((data_tag, device, epoch, steps, training_loss.item() / sample_cnt , val_loss.item(), val_result[device]["%s@%d" % (c, k)]))
 
-                print("steps: {}, training_loss: {:.6f}, val_loss: {:.6f}".format(steps, training_loss, val_loss))
+                print("steps: {}, training_loss: {:.6f}, val_loss: {:.6f}".format(steps, training_loss / sample_cnt, val_loss))
     cost = int(time.time() - start_stamp)
     print("training time cost: {} min {} sec".format(int(cost / 60), cost % 60))
     # choose the model with min val loss
@@ -87,7 +88,7 @@ def train(model, optimizer, train_iter, val_iter, num_epochs, data_tag, points):
 def test(model, data_iter, data_tag):
     model.eval()
     output_with_label = []
-    test_loss = 0.0
+    test_loss, sample_cnt = 0.0, 0
     for batch_index, batch in enumerate(data_iter):
         samples = batch.text.to(DEVICE)
         task_dict = {
@@ -102,10 +103,11 @@ def test(model, data_iter, data_tag):
         task_loss = [criterion(outputs[index], task_dict[device]) for index, device in enumerate(devices_order)]
         loss = sum(task_loss)
         test_loss += loss
+        sample_cnt += outputs[0].shape[0]
 
     result = evaluate(output_with_label, data_tag)
     model.train()
-    return test_loss, result
+    return test_loss / sample_cnt, result
 
 draw_points = []
 train(seq2seq, optimizer, review_train_iter, review_val_iter, REVIEW_NUM_EPOCHS, "review", draw_points)
