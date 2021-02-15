@@ -16,9 +16,7 @@ def load_label():
 
 # change the order of labels
 devices_order = ["screen", "hdisk", "gcard", "ram", "cpu"]
-devices_order_data = ["screen", "cpu", "ram", "hdisk", "gcard"]
-columns_name = ["text"]
-columns_name.extend(devices_order_data)
+columns_name = ["text"] + devices_order
 def label_permutation(label_dict):
     return [label_dict[device] for device in devices_order]
 
@@ -34,8 +32,7 @@ def load_review_data(label_dict):
         labels = label_permutation(label_dict[asin])
         for review in raw_reviews:
             if len(review.strip()) > 0:
-                d = [review]
-                d.extend(labels)
+                d = [review] + labels
                 review_data.append(d)
     return pd.DataFrame(review_data, columns=columns_name)
 
@@ -50,8 +47,7 @@ def load_needs_data(label_dict):
         labels = label_permutation(label_dict[asin])
         for need in raw_needs:
             if not pd.isnull(need) and len(need.strip()) > 0:
-                d = [need]
-                d.extend(labels)
+                d = [need] + labels
                 needs_data.append(d)
     return pd.DataFrame(needs_data, columns=columns_name)
 
@@ -114,9 +110,9 @@ def data_prepare():
 spacy_en = spacy.load("en_core_web_sm")
 TEXT = Field(sequential=True, tokenize=tokenize, lower=True, stop_words=set(stopwords.words('english')))
 LABEL = Field(sequential=False, use_vocab=False)
-fields = [("text", TEXT)]
-fields.extend([(device, LABEL) for device in devices_order_data])
-
+fields = [("text", TEXT)] + [(device, LABEL) for device in devices_order]
+# TODO: shuffle data after each batch
+# TODO: check why result become worse after the data is regenerated
 def get_data_iter():
     need_train, need_val, need_test = to_dataset("need", fields)
     review_train, review_val, review_test = to_dataset("review", fields)

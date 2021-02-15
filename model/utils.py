@@ -50,10 +50,9 @@ def show_result():
 
 
 def show_loss(df):
-    df = df[["tag", "epoch", "training_loss", "val_loss"]]
-    training_loss = df[["tag", "epoch", "training_loss"]].rename(columns={"training_loss": "loss"})
+    training_loss = df[["tag", "steps", "training_loss"]].rename(columns={"training_loss": "loss"})
     training_loss["description"] = "training"
-    val_loss = df[["tag", "epoch", "val_loss"]].rename(columns={"val_loss": "loss"})
+    val_loss = df[["tag", "steps", "val_loss"]].rename(columns={"val_loss": "loss"})
     val_loss["description"] = "validation"
     output = pd.concat([training_loss, val_loss])
     sns.set_theme()
