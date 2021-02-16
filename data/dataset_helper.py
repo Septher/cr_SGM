@@ -5,7 +5,7 @@ import pandas as pd
 from nltk.corpus import stopwords
 from torchtext.data import Field
 from torchtext import data
-from model.params import BATCH_SIZE_REVIEW, BATCH_SIZE_NEED, DEVICE
+from model.params import BATCH_SIZE_REVIEW, BATCH_SIZE_NEED, DEVICE, DEVICE_ORDER
 
 def load_label():
     label_path = "processed/labels_parsed.json"
@@ -14,12 +14,9 @@ def load_label():
         file.close()
     return label
 
-# change the order of labels
-devices_order = ["screen", "hdisk", "gcard", "ram", "cpu"]
-devices_order_data = ["screen", "cpu", "ram", "hdisk", "gcard"]
-columns_name = ["text"] + devices_order_data
+columns_name = ["text"] + DEVICE_ORDER
 def label_permutation(label_dict):
-    return [label_dict[device] for device in devices_order]
+    return [label_dict[device] for device in DEVICE_ORDER]
 
 def load_review_data(label_dict):
     raw_review_data_path = "raw/amazon_reviews - IEEE.xlsx"
@@ -76,12 +73,14 @@ def save_as_tsv(df, file_name):
     path = "processed/%s" % file_name
     df.to_csv(path, sep='\t', index=False, header=False)
 
-# review data -> 80% train 20% val
+# review data -> 90% train 10% val
 # need data -> 60% train 20% val 20% test
 def dataset_split_and_save(samples, ratio, prefix):
     if len(ratio) != 3 or abs(sum(ratio) - 1) > 0.0001:
         print("ratio error!")
         return [], [], []
+    # shuffle the DataFrame rows
+    samples = samples.sample(frac=1)
     n = len(samples)
     train_cnt = int(n * ratio[0])
     val_cnt = int(n * ratio[1])
@@ -111,9 +110,8 @@ def data_prepare():
 spacy_en = spacy.load("en_core_web_sm")
 TEXT = Field(sequential=True, tokenize=tokenize, lower=True, stop_words=set(stopwords.words('english')))
 LABEL = Field(sequential=False, use_vocab=False)
-fields = [("text", TEXT)] + [(device, LABEL) for device in devices_order_data]
-# TODO: shuffle data after each batch
-# TODO: check why result become worse after the data is regenerated
+fields = [("text", TEXT)] + [(device, LABEL) for device in DEVICE_ORDER]
+
 def get_data_iter():
     need_train, need_val, need_test = to_dataset("need", fields)
     review_train, review_val, review_test = to_dataset("review", fields)

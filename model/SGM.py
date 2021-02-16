@@ -1,10 +1,10 @@
 import torch
 import torch.nn as nn
 from torchtext.vocab import GloVe
-from data.dataset_helper import TEXT, devices_order, get_data_iter
+from data.dataset_helper import TEXT, get_data_iter
 from data.label_parser import label_cnt
 import random
-from model.params import DEVICE
+from model.params import DEVICE, DEVICE_ORDER
 
 class Encoder(nn.Module):
     def __init__(self, embedding_size, hidden_size, num_layers, p):
@@ -109,7 +109,7 @@ class Seq2Seq(nn.Module):
         outputs = []
         prev_task = "init"
         x = torch.zeros(batch_size, device=DEVICE, dtype=torch.int64)
-        for t, task in enumerate(devices_order):
+        for t, task in enumerate(DEVICE_ORDER):
             output, hidden, cell = self.decoder(x, encoder_states, hidden, cell, prev_task, task)
             x = output.argmax(1) if random.random() < self.teacher_force else target_dict[task]
             outputs.append(output)

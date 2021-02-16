@@ -1,12 +1,10 @@
-from data.dataset_helper import devices_order
+from model.params import DEVICE_ORDER, K
 import torch
 import math
 
-K = 5
-
 def evaluate(output_with_label, data_tag):
     result = dict()
-    for index, device in enumerate(devices_order):
+    for index, device in enumerate(DEVICE_ORDER):
         outputs = torch.cat([output[index] for output, _ in output_with_label], dim=0)
         labels = torch.cat([label_dict[device] for _, label_dict in output_with_label], dim=0)
         result[device] = calculate(outputs, labels)
@@ -38,7 +36,7 @@ def calculate(outputs, labels):
 def show_result(result, data_tag):
     print("%s training result: " % data_tag)
     recall_ave = 0.0
-    for device in devices_order:
+    for device in DEVICE_ORDER:
         for criterion in ["recall"]:
             print("%s %s: %s" % (device, criterion, str(["%.4f" % result[device]["%s@%d" % (criterion, k + 1)] for k in range(K)])))
         recall_ave += sum([result[device]["recall@%d" % (k + 1)] for k in range(K)])
