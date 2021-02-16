@@ -16,7 +16,8 @@ def load_label():
 
 # change the order of labels
 devices_order = ["screen", "hdisk", "gcard", "ram", "cpu"]
-columns_name = ["text"] + devices_order
+devices_order_data = ["screen", "cpu", "ram", "hdisk", "gcard"]
+columns_name = ["text"] + devices_order_data
 def label_permutation(label_dict):
     return [label_dict[device] for device in devices_order]
 
@@ -110,7 +111,7 @@ def data_prepare():
 spacy_en = spacy.load("en_core_web_sm")
 TEXT = Field(sequential=True, tokenize=tokenize, lower=True, stop_words=set(stopwords.words('english')))
 LABEL = Field(sequential=False, use_vocab=False)
-fields = [("text", TEXT)] + [(device, LABEL) for device in devices_order]
+fields = [("text", TEXT)] + [(device, LABEL) for device in devices_order_data]
 # TODO: shuffle data after each batch
 # TODO: check why result become worse after the data is regenerated
 def get_data_iter():
@@ -121,11 +122,11 @@ def get_data_iter():
 
     need_train_iter, need_val_iter, need_test_iter = data.Iterator.splits(
         (need_train, need_val, need_test), sort_key=lambda x: len(x.text),
-        batch_sizes=(BATCH_SIZE_REVIEW, BATCH_SIZE_REVIEW, BATCH_SIZE_REVIEW), device=DEVICE, shuffle=True)
+        batch_sizes=(BATCH_SIZE_NEED, BATCH_SIZE_NEED, BATCH_SIZE_NEED), device=DEVICE, shuffle=True)
 
     review_train_iter, review_val_iter, _ = data.Iterator.splits(
         (review_train, review_val, review_test), sort_key=lambda x: len(x.text),
-        batch_sizes=(BATCH_SIZE_NEED, BATCH_SIZE_NEED, BATCH_SIZE_NEED), device=DEVICE, shuffle=True)
+        batch_sizes=(BATCH_SIZE_REVIEW, BATCH_SIZE_REVIEW, BATCH_SIZE_REVIEW), device=DEVICE, shuffle=True)
 
     return review_train_iter, review_val_iter, need_train_iter, need_val_iter, need_test_iter
 

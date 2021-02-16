@@ -45,9 +45,11 @@ def save_data_to_csv(draw_points, columns, save_file=loss_data_path):
 def show_result():
     df = pd.read_csv(loss_data_path, index_col=0)
     # training loss and val loss during training
-    show_loss(df.loc[df["tag"] == "need"])
-    show_loss(df.loc[df["tag"] == "review"])
-
+    # show_loss(df.loc[df["tag"] == "need"])
+    # show_loss(df.loc[df["tag"] == "review"])
+    # show recall@k
+    show_recall(df.loc[df["tag"] == "need"])
+    show_recall(df.loc[df["tag"] == "need"])
 
 def show_loss(df):
     training_loss = df[["tag", "steps", "training_loss"]].rename(columns={"training_loss": "loss"})
@@ -58,3 +60,16 @@ def show_loss(df):
     sns.set_theme()
     sns.lineplot(data=output, x="steps", y="loss", hue="description")
     plt.show()
+
+def show_recall(df):
+    data = []
+    for i in range(1, 6):
+        v = "recall@%d" % i
+        d = df[["steps", v]].rename(columns={v: "recall"})
+        d["description"] = v
+        data.append(d)
+    output = pd.concat(data)
+    sns.set_theme()
+    sns.lineplot(data=output, x="steps", y="recall", hue="description")
+
+show_result()
