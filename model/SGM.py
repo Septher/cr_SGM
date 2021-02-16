@@ -3,6 +3,8 @@ import torch.nn as nn
 from torchtext.vocab import GloVe
 from data.dataset_helper import TEXT, devices_order, get_data_iter
 from data.label_parser import label_cnt
+import random
+from model.params import DEVICE
 
 class Encoder(nn.Module):
     def __init__(self, embedding_size, hidden_size, num_layers, p):
@@ -95,31 +97,24 @@ class Decoder(nn.Module):
         return predictions, hidden, cell
 
 class Seq2Seq(nn.Module):
-    def __init__(self, encoder, decoder):
+    def __init__(self, encoder, decoder, p):
         super(Seq2Seq, self).__init__()
         self.encoder = encoder
         self.decoder = decoder
+        self.teacher_force = p
 
-    def forward(self, samples):
-        batch_size, device = samples.shape[1], samples.device
-        encoder_states, hidden, cell = self.encoder(samples)
+    def forward(self, source, target_dict):
+        batch_size = source.shape[1]
+        encoder_states, hidden, cell = self.encoder(source)
         outputs = []
         prev_task = "init"
-        x = torch.zeros(batch_size, device=device, dtype=torch.int64)
+        x = torch.zeros(batch_size, device=DEVICE, dtype=torch.int64)
         for t, task in enumerate(devices_order):
             output, hidden, cell = self.decoder(x, encoder_states, hidden, cell, prev_task, task)
-            x = output.argmax(1)
-            # x = self.to_one_hot(x, task, device)
+            x = output.argmax(1) if random.random() < self.teacher_force else target_dict[task]
             outputs.append(output)
             prev_task = task
         return outputs
-
-    def to_one_hot(self, x, task, device):
-        batch_size, dimension = x.shape[0], label_cnt[task]
-        one_hot = torch.zeros((batch_size, dimension), device=device)
-        x = x.unsqueeze(1)
-        # (batch_size, 1)
-        return one_hot.scatter_(1, x, 1)
 
 #
 # def check_embedding():
