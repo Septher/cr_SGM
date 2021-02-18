@@ -1,15 +1,17 @@
 import seaborn as sns
 import pandas as pd
 import matplotlib.pyplot as plt
+import json
+from pandas import DataFrame
+from model.params import DEVICE_ORDER
 
-def show_result(file_name):
-    df = pd.read_csv(file_name, index_col=0)
+def show_result():
+    # df = pd.read_csv(file_name, index_col=0)
     # training loss and val loss during training
     # show_loss(df.loc[df["tag"] == "need"])
     # show_loss(df.loc[df["tag"] == "review"])
     # show recall@k
-    show_recall(df.loc[df["tag"] == "need"])
-    show_recall(df.loc[df["tag"] == "need"])
+    show_test_recall()
 
 def show_loss(df):
     training_loss = df[["tag", "steps", "training_loss"]].rename(columns={"training_loss": "loss"})
@@ -21,15 +23,36 @@ def show_loss(df):
     sns.lineplot(data=output, x="steps", y="loss", hue="description")
     plt.show()
 
-def show_recall(df):
-    data = []
-    for i in range(1, 6):
-        v = "recall@%d" % i
-        d = df[["steps", v]].rename(columns={v: "recall"})
-        d["description"] = v
-        data.append(d)
-    output = pd.concat(data)
-    sns.set_theme()
-    sns.lineplot(data=output, x="steps", y="recall", hue="description")
+def show_cat_plot(data, title):
+    df = DataFrame(data=data, columns=columns)
+    g = sns.catplot(
+        data=df, kind="bar",
+        x="criterion", y="score", hue="description",
+        ci="sd", palette="dark", alpha=.6, height=6
+    )
+    g.despine(left=True)
+    g.set_axis_labels("criterion", "score")
+    g.legend.set_title(title)
+    plt.show()
 
-# show_result()
+
+columns = ["description", "criterion", "score"]
+files = ["baseline", "hidden_size_128", "hidden_size_256"]
+# files = ["baseline", "embedding_size_256", "embedding_size_512"]
+def show_test_recall():
+    sns.set_theme(style="whitegrid")
+    data_points = {}
+    terms = ["overall"] + DEVICE_ORDER
+    for device in terms:
+        data_points[device] = []
+    for file in files:
+        with open("processed_test_result/%s.json" % file, "r") as fd:
+            data = json.load(fd)
+            fd.close()
+            for device in terms:
+                d = [(file, "%s@%d" % (c, i), data[device]["%s@%d" % (c, i)]) for c in ["recall"] for i in range(1, 6)]
+                data_points[device].extend(d)
+    for device in terms:
+        show_cat_plot(data_points[device], device)
+
+show_result()
