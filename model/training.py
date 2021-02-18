@@ -1,15 +1,13 @@
 import sys
 sys.path.append('/home/mlu/code/cr_SGM')
-import torch
 import torch.nn as nn
-from data.dataset_helper import get_data_iter, TEXT, devices_order
+from data.dataset_helper import get_data_iter, TEXT
 from model.SGM import Encoder, Decoder, Seq2Seq
 from model.evaluation import evaluate
 import torch.optim as optim
 import time
-from model.utils import load_checkpoint, save_checkpoint, save_data_to_csv
-from model.params import DEVICE, WORD_EMBEDDING_SIZE, HIDDEN_SIZE, NUM_LAYERS, DROP_OUT_EN, DROP_OUT_DE, TASK_EMBEDDING_SIZE, LEARNING_RATE, load_model, save_model, REVIEW_NUM_EPOCHS, NEED_NUM_EPOCHS, TEACHER_FORCE
-
+from model.utils import load_checkpoint, save_all
+from model.params import *
 review_train_iter, review_val_iter, need_train_iter, need_val_iter, need_test_iter = get_data_iter()
 
 encoder = Encoder(
@@ -54,7 +52,7 @@ def train(model, optimizer, train_iter, val_iter, num_epochs, data_tag, points):
                 "gcard": batch.gcard.to(DEVICE)
             }
             outputs = model(source, target_dict)
-            task_loss = [criterion(outputs[index], target_dict[device]) for index, device in enumerate(devices_order)]
+            task_loss = [criterion(outputs[index], target_dict[device]) for index, device in enumerate(DEVICE_ORDER)]
             loss = sum(task_loss)
             training_loss += loss
             sample_cnt += outputs[0].shape[0]
@@ -73,7 +71,7 @@ def train(model, optimizer, train_iter, val_iter, num_epochs, data_tag, points):
                         "state_dict": model.state_dict(),
                         "optimizer": optimizer.state_dict()
                     }
-                for device in devices_order:
+                for device in DEVICE_ORDER:
                     for k in range(1, 6):
                         for c in ["recall", "precision", "nDCG"]:
                             points.append((data_tag, device, epoch, steps, training_loss.item() / sample_cnt, val_loss.item(), val_result[device]["%s@%d" % (c, k)], "%s@%d" % (c, k)))
@@ -82,7 +80,6 @@ def train(model, optimizer, train_iter, val_iter, num_epochs, data_tag, points):
     cost = int(time.time() - start_stamp)
     print("training time cost: {} min {} sec".format(int(cost / 60), cost % 60))
     # choose the model with min val loss
-    save_checkpoint(checkpoint, data_tag)
     load_checkpoint(checkpoint, model, optimizer)
     print("best steps: %d, min val loss: %.4f" % (best_steps, min_val_loss))
 
@@ -101,7 +98,7 @@ def test(model, data_iter, data_tag):
         }
         outputs = model(samples, task_dict)
         output_with_label.append((outputs, task_dict))
-        task_loss = [criterion(outputs[index], task_dict[device]) for index, device in enumerate(devices_order)]
+        task_loss = [criterion(outputs[index], task_dict[device]) for index, device in enumerate(DEVICE_ORDER)]
         loss = sum(task_loss)
         test_loss += loss
         sample_cnt += outputs[0].shape[0]
@@ -113,6 +110,10 @@ def test(model, data_iter, data_tag):
 draw_points = []
 train(seq2seq, optimizer, review_train_iter, review_val_iter, REVIEW_NUM_EPOCHS, "review", draw_points)
 train(seq2seq, optimizer, need_train_iter, need_val_iter, NEED_NUM_EPOCHS, "need", draw_points)
-test(seq2seq, need_test_iter, "need")
+_, test_result = test(seq2seq, need_test_iter, "need")
 
-save_data_to_csv(draw_points, columns=["tag", "device", "epoch", "steps", "training_loss", "val_loss", "score", "description"])
+checkpoint = {
+    "state_dict": seq2seq.state_dict(),
+    "optimizer": optimizer.state_dict()
+}
+save_all(checkpoint, draw_points, test_result)
