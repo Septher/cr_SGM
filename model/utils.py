@@ -2,7 +2,7 @@ import torch
 import json
 from pandas import DataFrame
 from datetime import datetime
-from model.params import get_params_dict
+from model.params import get_params_dict, save_model
 
 prefix = "../result/"
 loss_file_prefix = prefix + "training_process/"
@@ -30,13 +30,14 @@ def save_to_json(data, path):
         fp.close()
 
 def save_all(checkpoints, points, test_result):
-    date_str = datetime.now().strftime("%m-%d-%H-%m")
+    date_str = datetime.now().strftime("%m-%d-%H-%M")
     model_path = "%s%s.pth.tar" % (model_file_prefix, date_str)
     loss_path = "%s%s.csv" % (loss_file_prefix, date_str)
     param_path = "%s%s.json" % (params_file_prefix, date_str)
     test_result_path = "%s%s.json" % (test_file_prefix, date_str)
 
-    save_checkpoint(checkpoints, model_path)
+    if save_model:
+        save_checkpoint(checkpoints, model_path)
     save_to_csv(points, loss_path)
     save_to_json(get_params_dict(), param_path)
     save_to_json(test_result, test_result_path)

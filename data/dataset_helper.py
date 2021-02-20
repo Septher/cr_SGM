@@ -129,4 +129,3 @@ def get_data_iter():
     return review_train_iter, review_val_iter, need_train_iter, need_val_iter, need_test_iter
 
 # data_prepare()
-#     get_data_iter()

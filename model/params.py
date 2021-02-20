@@ -7,18 +7,20 @@ K = 5
 BATCH_SIZE_REVIEW = 32
 BATCH_SIZE_NEED = 16
 REVIEW_NUM_EPOCHS = 12
-NEED_NUM_EPOCHS = 15
+NEED_NUM_EPOCHS = 12
 LEARNING_RATE = 3e-4
 DEVICE = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 # the prediction order of tasks
-DEVICE_ORDER = ["screen", "hdisk", "gcard", "ram", "cpu"]
+DEVICE_ORDER = ["screen", "cpu", "ram", "hdisk", "gcard"]
+#DEVICE_ORDER = ["screen", "hdisk", "gcard", "ram", "cpu"]
+
 load_model = False
-save_model = True
+save_model = False
 
 # model hyper parameters
 HIDDEN_SIZE = 512
 NUM_LAYERS = 1
-TEACHER_FORCE = 0.5
+TEACHER_FORCE = 1.1
 # encoder
 DROP_OUT_EN = 0.0
 WORD_EMBEDDING_SIZE = 200 # GLOVE 6B 200d
