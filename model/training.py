@@ -26,6 +26,7 @@ decoder = Decoder(
 
 seq2seq = Seq2Seq(encoder, decoder, TEACHER_FORCE).to(DEVICE)
 optimizer = optim.Adam(seq2seq.parameters(), lr=LEARNING_RATE)
+# optimizer = optim.SGD(seq2seq.parameters(), momentum=0.9, lr=LEARNING_RATE)
 pad_idx = TEXT.vocab.stoi["<pad>"]
 criterion = nn.CrossEntropyLoss(ignore_index=pad_idx)
 

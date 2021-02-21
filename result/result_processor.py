@@ -1,16 +1,6 @@
 import json
 from model.params import DEVICE_ORDER
 
-file2description = {
-    "02-19-10-24.json": "baseline",
-    "02-19-10-32.json": "baseline",
-    "02-19-10-39.json": "baseline"
-    # ,
-    # "02-19-11-03.json": "change_device_order",
-    # "02-19-11-10.json": "change_device_order",
-    # "02-19-11-20.json": "change_device_order"
-}
-
 def process():
     title = "embedding_size_512"
     files = ["02-20-12-47", "02-20-13-03", "02-20-13-09"]

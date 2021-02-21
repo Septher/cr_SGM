@@ -16,23 +16,27 @@ class Encoder(nn.Module):
         self.embed = nn.Embedding(len(vocab), embedding_size)
         self.embed.weight.data.copy_(vocab.vectors)
         self.lstm = nn.LSTM(embedding_size, hidden_size, num_layers, dropout=p, bidirectional=True)
-        self.hidden_fc = nn.Linear(hidden_size * num_layers * 2, hidden_size) # reduce hidden dimension
-        self.cell_fc = nn.Linear(hidden_size * num_layers * 2, hidden_size)
+        self.hidden_fc = nn.Linear(hidden_size * 2, hidden_size) # reduce hidden dimension
+        self.cell_fc = nn.Linear(hidden_size * 2, hidden_size)
 
     def forward(self, x):
         # index -> (seq_len, batch_size)
         embedding = self.embed(x)
         # embedding -> (seq_len, batch, embedding_size)
         encoder_states, (hidden, cell) = self.lstm(embedding)
-        # (num_layers * num_dir, batch, hidden_size) -> (1, batch, hidden_size * num_dir * num_layers)
-        hidden = torch.cat([hidden[i: i + 1] for i in range(self.num_layers * 2)], dim=2)
-        cell = torch.cat([cell[i: i + 1] for i in range(self.num_layers * 2)], dim=2)
-        # hidden = torch.cat([torch.cat((hidden[i * 2: i * 2 + 1], hidden[i * 2 + 1: i * 2 + 2]), dim=2) for i in range(self.num_layers)], dim=2)
-        # cell = torch.cat([torch.cat((cell[i * 2: i * 2 + 1], cell[i * 2 + 1: i * 2 + 2]), dim=2) for i in range(self.num_layers)], dim=2)
+        # (num_layers * num_dir, batch, hidden_size) -> num_dir * (num_layers, batch, hidden_size) -> (num_layers, batch, hidden_size * num_dir)
+        hidden_forward = torch.cat([hidden[i * 2: i * 2 + 1] for i in range(self.num_layers)], dim=0)
+        hidden_backward = torch.cat([hidden[i * 2 + 1: i * 2 + 2] for i in range(self.num_layers)], dim=0)
+        hidden = torch.cat([hidden_forward, hidden_backward], dim=2)
+
+        cell_forward = torch.cat([cell[i * 2: i * 2 + 1] for i in range(self.num_layers)], dim=0)
+        cell_backward = torch.cat([cell[i * 2 + 1: i * 2 + 2] for i in range(self.num_layers)], dim=0)
+        cell = torch.cat([cell_forward, cell_backward], dim=2)
+
         hidden = self.hidden_fc(hidden)
         cell = self.cell_fc(cell)
         # encoder_state -> (seq_len, batch, hidden_size * num_dir)
-        # cell, hidden -> (1, batch, hidden_size)
+        # cell, hidden -> (num_layers, batch, hidden_size)
         return encoder_states, hidden, cell
 
 class Decoder(nn.Module):
@@ -74,7 +78,7 @@ class Decoder(nn.Module):
     # for t = 1, they are from the last step of encoder
     def forward(self, x, encoder_states, hidden, cell, input_task, cur_task):
         seq_len = encoder_states.shape[0]
-        # (1, batch, hidden_size) -> (seq_len, batch, hidden_size)
+        # (num_layers, batch, hidden_size) -> (1, batch, hidden_size) -> (seq_len * num_layers, batch, hidden_size)
         h_reshaped = hidden[-1].repeat(seq_len, 1, 1)
 
         # (seq_len, batch, hidden_size + hidden_size * 2) -> (seq_len, batch, 1)
