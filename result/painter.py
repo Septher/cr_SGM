@@ -37,7 +37,8 @@ def show_cat_plot(data, title):
 
 
 columns = ["description", "criterion", "score"]
-files = ["lx_baseline", "optimized_baseline_v1", "optimized_baseline_v2"]
+#files = ["baseline", "change_device_order"]
+files = ["lx_baseline", "optimal_params", "optimal_params+teacher_forcing_0.5", "optimal_params+teacher_forcing_0.5+ls_0.05"]
 def show_test_recall():
     sns.set_theme(style="whitegrid")
     data_points = {}

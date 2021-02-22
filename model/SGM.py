@@ -1,5 +1,6 @@
 import torch
 import torch.nn as nn
+import torch.nn.functional as F
 from torchtext.vocab import GloVe
 from data.dataset_helper import TEXT, get_data_iter
 from data.label_parser import label_cnt
@@ -120,7 +121,27 @@ class Seq2Seq(nn.Module):
             prev_task = task
         return outputs
 
-#
+class LabelSmoothing(nn.Module):
+    """
+    NLL loss with label smoothing.
+    """
+    def __init__(self, smoothing=0.0):
+        """
+        Constructor for the LabelSmoothing module.
+        :param smoothing: label smoothing factor
+        """
+        super(LabelSmoothing, self).__init__()
+        self.confidence = 1.0 - smoothing
+        self.smoothing = smoothing
+
+    def forward(self, x, target):
+        log_probs = F.log_softmax(x, dim=-1)
+
+        nll_loss = -log_probs.gather(dim=-1, index=target.unsqueeze(1)).squeeze(1)
+        smooth_loss = -log_probs.mean(dim=-1)
+        loss = self.confidence * nll_loss + self.smoothing * smooth_loss
+        return loss.mean()
+
 # def check_embedding():
 #     _, _, _, _, need_iter = get_data_iter()
 #     embedding_glove = GloVe(name='6B', dim=100)

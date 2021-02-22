@@ -2,8 +2,8 @@ import json
 from model.params import DEVICE_ORDER
 
 def process():
-    title = "embedding_size_512"
-    files = ["02-20-12-47", "02-20-13-03", "02-20-13-09"]
+    title = "optimal_params+teacher_forcing_0.5+ls_0.05"
+    files = ["02-23-14-47", "02-23-15-01", "02-23-15-10"]
     output = {"overall": {}}
     for device in DEVICE_ORDER:
         output[device] = {}
