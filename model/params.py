@@ -10,7 +10,7 @@ REVIEW_NUM_EPOCHS = 12
 NEED_NUM_EPOCHS = 12
 LEARNING_RATE = 1e-4
 DEVICE = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-# the prediction order of tasks
+
 DEVICE_ORDER = ["screen", "cpu", "ram", "hdisk", "gcard"]
 #DEVICE_ORDER = ["screen", "hdisk", "gcard", "ram", "cpu"]
 

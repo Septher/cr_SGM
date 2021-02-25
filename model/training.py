@@ -2,7 +2,7 @@ import sys
 sys.path.append('/home/mlu/code/cr_SGM')
 import torch.nn as nn
 from data.dataset_helper import get_data_iter, TEXT
-from model.SGM import Encoder, Decoder, Seq2Seq
+from model.SGM import Encoder, Decoder, Seq2Seq, LabelSmoothing
 from model.evaluation import evaluate
 import torch.optim as optim
 import time
@@ -28,7 +28,8 @@ seq2seq = Seq2Seq(encoder, decoder, TEACHER_FORCE).to(DEVICE)
 optimizer = optim.Adam(seq2seq.parameters(), lr=LEARNING_RATE)
 # optimizer = optim.SGD(seq2seq.parameters(), momentum=0.9, lr=LEARNING_RATE)
 pad_idx = TEXT.vocab.stoi["<pad>"]
-criterion = nn.CrossEntropyLoss(ignore_index=pad_idx)
+# criterion = nn.CrossEntropyLoss(ignore_index=pad_idx)
+criterion = LabelSmoothing(smoothing=0.05)
 
 if load_model:
     load_checkpoint(torch.load("50_no_clip_review_checkpoint.pth.tar"), seq2seq, optimizer)
