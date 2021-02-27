@@ -3,7 +3,6 @@ import torch.nn as nn
 import torch.nn.functional as F
 from torchtext.vocab import GloVe
 from data.dataset_helper import TEXT, get_data_iter
-from data.label_parser import label_cnt
 import random
 from model.params import DEVICE, DEVICE_ORDER
 
