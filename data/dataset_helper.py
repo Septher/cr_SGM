@@ -6,6 +6,7 @@ from nltk.corpus import stopwords
 from torchtext.data import Field
 from torchtext import data
 from model.params import BATCH_SIZE_REVIEW, BATCH_SIZE_NEED, DEVICE, DEVICE_ORDER
+from data.label_parser import label_cnt
 
 def load_label():
     label_path = "processed/labels_parsed.json"
@@ -129,3 +130,32 @@ def get_data_iter():
     return review_train_iter, review_val_iter, need_train_iter, need_val_iter, need_test_iter
 
 # data_prepare()
+
+def get_criterion_weight():
+    paths = {"need": "../data/processed/need_train.tsv", "review": "../data/processed/review_train.tsv"}
+    # get the distribution of labels for each task
+    num_dict = {"need": {}, "review": {}}
+    for k in ["need", "review"]:
+        df = pd.read_csv(paths[k], sep="\t", names=columns_name)
+        for device in DEVICE_ORDER:
+            num_dict[k][device] = {}
+        for _, row in df.iterrows():
+            for device in DEVICE_ORDER:
+                v = int(row[device])
+                if v not in num_dict[k][device]:
+                    num_dict[k][device][v] = 0
+                num_dict[k][device][v] += 1
+        # print(k)
+        # for device in DEVICE_ORDER:
+        #     print(device + "\t" + str(num_dict[k][device]))
+    # calculate the weight of each label based on the distribution of labels
+    weight_dict = {"need": {}, "review": {}}
+    for device in DEVICE_ORDER:
+        for kd in ["need", "review"]:
+            weights = [0] * label_cnt[device]
+            for k, v in num_dict[kd][device].items():
+                weights[k] = 1.0 / v
+            weight_dict[kd][device] = weights
+    return weight_dict
+
+# get_criterion_weight()

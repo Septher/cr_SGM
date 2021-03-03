@@ -1,7 +1,7 @@
 import sys
 sys.path.append('/home/mlu/code/cr_SGM')
 import torch.nn as nn
-from data.dataset_helper import get_data_iter, TEXT
+from data.dataset_helper import get_data_iter, TEXT, get_criterion_weight
 from model.SGM import Encoder, Decoder, Seq2Seq, LabelSmoothing
 from model.evaluation import evaluate
 import torch.optim as optim
@@ -28,6 +28,13 @@ seq2seq = Seq2Seq(encoder, decoder, TEACHER_FORCE).to(DEVICE)
 optimizer = optim.Adam(seq2seq.parameters(), lr=LEARNING_RATE)
 # optimizer = optim.SGD(seq2seq.parameters(), momentum=0.9, lr=LEARNING_RATE)
 pad_idx = TEXT.vocab.stoi["<pad>"]
+# set criterion weight
+# criterion_dict = {"need": {}, "review": {}}
+# weight_dict = get_criterion_weight()
+# for device in DEVICE_ORDER:
+#     for k in ["need", "review"]:
+#         criterion_dict[k][device] = nn.CrossEntropyLoss(ignore_index=pad_idx, weight=torch.as_tensor(weight_dict[k][device], device=DEVICE))
+
 # criterion = nn.CrossEntropyLoss(ignore_index=pad_idx)
 criterion = LabelSmoothing(smoothing=0.05)
 
@@ -54,6 +61,7 @@ def train(model, optimizer, train_iter, val_iter, num_epochs, data_tag, points):
                 "gcard": batch.gcard.to(DEVICE)
             }
             outputs = model(source, target_dict)
+            # task_loss = [criterion_dict[data_tag][device](outputs[index], target_dict[device]) for index, device in enumerate(DEVICE_ORDER)]
             task_loss = [criterion(outputs[index], target_dict[device]) for index, device in enumerate(DEVICE_ORDER)]
             loss = sum(task_loss)
             training_loss += loss
@@ -100,6 +108,7 @@ def test(model, data_iter, data_tag):
         }
         outputs = model(samples, task_dict)
         output_with_label.append((outputs, task_dict))
+        # task_loss = [criterion_dict[data_tag][device](outputs[index], task_dict[device]) for index, device in enumerate(DEVICE_ORDER)]
         task_loss = [criterion(outputs[index], task_dict[device]) for index, device in enumerate(DEVICE_ORDER)]
         loss = sum(task_loss)
         test_loss += loss
