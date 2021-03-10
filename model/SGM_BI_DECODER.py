@@ -180,8 +180,7 @@ class Seq2Seq(nn.Module):
         # hidden state after the task is finished
         # (num_layers, batch, hidden_size)
         backward_hidden_dict = {}
-        DEVICE_ORDER.reverse()
-        for t, task in enumerate(DEVICE_ORDER):
+        for t, task in enumerate(REVERSED_DEVICE_ORDER):
             backward_hidden_dict[task] = torch.cat([hidden[i: i + 1] for i in range(NUM_LAYERS)], dim=2)
             output, hidden, cell = self.decoder_backward(inputs, encoder_states, hidden, cell, prev_task, task)
             inputs = output.argmax(1) if random.random() < self.teacher_force else target_dict[task]
@@ -192,7 +191,6 @@ class Seq2Seq(nn.Module):
         forward_outputs = []
         prev_task = "init"
         inputs = torch.zeros(batch_size, device=DEVICE, dtype=torch.int64)
-        DEVICE_ORDER.reverse()
         for t, task in enumerate(DEVICE_ORDER):
             output, hidden, cell = self.decoder_forward(inputs, encoder_states, backward_hidden_dict[task], hidden, cell, prev_task, task)
             inputs = output.argmax(1) if random.random() < self.teacher_force else target_dict[task]

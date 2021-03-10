@@ -2,8 +2,8 @@ import json
 from model.params import DEVICE_ORDER
 
 def process():
-    title = "bi_decoder"
-    files = ["03-07-18-14", "03-07-18-35", "03-07-19-01", "03-07-19-57", "03-07-20-11"]
+    title = "transformer"
+    files = ["03-20-23-34", "03-21-11-32", "03-21-13-11"]
     output = {"overall": {}}
     for device in DEVICE_ORDER:
         output[device] = {}

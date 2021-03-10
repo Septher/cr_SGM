@@ -2,7 +2,7 @@ import sys
 sys.path.append('/home/mlu/code/cr_SGM')
 import torch.nn as nn
 from data.dataset_helper import get_data_iter, TEXT, get_criterion_weight
-from model.SGM_BI_DECODER import Seq2Seq
+from model.Transfomer import Transformer
 from model.SGM import LabelSmoothing
 from model.evaluation import evaluate
 import torch.optim as optim
@@ -11,17 +11,9 @@ from model.utils import load_checkpoint, save_all
 from model.params import *
 review_train_iter, review_val_iter, need_train_iter, need_val_iter, need_test_iter = get_data_iter()
 
-seq2seq = Seq2Seq().to(DEVICE)
+seq2seq = Transformer().to(DEVICE)
 optimizer = optim.Adam(seq2seq.parameters(), lr=LEARNING_RATE)
-# optimizer = optim.SGD(seq2seq.parameters(), momentum=0.9, lr=LEARNING_RATE)
 pad_idx = TEXT.vocab.stoi["<pad>"]
-# set criterion weight
-# criterion_dict = {"need": {}, "review": {}}
-# weight_dict = get_criterion_weight()
-# for device in DEVICE_ORDER:
-#     for k in ["need", "review"]:
-#         criterion_dict[k][device] = nn.CrossEntropyLoss(ignore_index=pad_idx, weight=torch.as_tensor(weight_dict[k][device], device=DEVICE))
-
 # criterion = nn.CrossEntropyLoss(ignore_index=pad_idx)
 criterion = LabelSmoothing(smoothing=0.05)
 
@@ -47,13 +39,12 @@ def train(model, optimizer, train_iter, val_iter, num_epochs, data_tag, points):
                 "hdisk": batch.hdisk.to(DEVICE),
                 "gcard": batch.gcard.to(DEVICE)
             }
-            forward_outputs, backward_outputs = model(source, target_dict)
+            outputs = model(source, target_dict)
             # task_loss = [criterion_dict[data_tag][device](outputs[index], target_dict[device]) for index, device in enumerate(DEVICE_ORDER)]
-            task_loss_backward = sum([criterion(backward_outputs[index], target_dict[device]) for index, device in enumerate(REVERSED_DEVICE_ORDER)])
-            task_loss_forward = sum([criterion(forward_outputs[index], target_dict[device]) for index, device in enumerate(DEVICE_ORDER)])
-            loss = task_loss_forward + task_loss_backward
+            task_loss = [criterion(outputs[index], target_dict[device]) for index, device in enumerate(DEVICE_ORDER)]
+            loss = sum(task_loss)
             training_loss += loss
-            sample_cnt += forward_outputs[0].shape[0]
+            sample_cnt += outputs[0].shape[0]
 
             optimizer.zero_grad()
             loss.backward()
@@ -94,15 +85,13 @@ def test(model, data_iter, data_tag):
             "hdisk": batch.hdisk.to(DEVICE),
             "gcard": batch.gcard.to(DEVICE)
         }
-        forward_outputs, backward_outputs = model(samples, task_dict)
-        output_with_label.append((forward_outputs, task_dict))
-
-        # task_loss = [criterion_dict[data_tag][device](outputs[index], target_dict[device]) for index, device in enumerate(DEVICE_ORDER)]
-        task_loss_backward = sum([criterion(backward_outputs[index], task_dict[device]) for index, device in enumerate(REVERSED_DEVICE_ORDER)])
-        task_loss_forward = sum([criterion(forward_outputs[index], task_dict[device]) for index, device in enumerate(DEVICE_ORDER)])
-        loss = task_loss_forward + task_loss_backward
+        outputs = model(samples, task_dict)
+        output_with_label.append((outputs, task_dict))
+        # task_loss = [criterion_dict[data_tag][device](outputs[index], task_dict[device]) for index, device in enumerate(DEVICE_ORDER)]
+        task_loss = [criterion(outputs[index], task_dict[device]) for index, device in enumerate(DEVICE_ORDER)]
+        loss = sum(task_loss)
         test_loss += loss
-        sample_cnt += forward_outputs[0].shape[0]
+        sample_cnt += outputs[0].shape[0]
 
     result = evaluate(output_with_label, data_tag)
     model.train()

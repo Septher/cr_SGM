@@ -6,13 +6,13 @@ K = 5
 # training hyper parameters
 BATCH_SIZE_REVIEW = 32
 BATCH_SIZE_NEED = 16
-REVIEW_NUM_EPOCHS = 12
-NEED_NUM_EPOCHS = 12
+REVIEW_NUM_EPOCHS = 15
+NEED_NUM_EPOCHS = 15
 LEARNING_RATE = 1e-4
 DEVICE = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
 DEVICE_ORDER = ["screen", "cpu", "ram", "hdisk", "gcard"]
-#DEVICE_ORDER = ["screen", "hdisk", "gcard", "ram", "cpu"]
+REVERSED_DEVICE_ORDER = DEVICE_ORDER[::-1]
 
 load_model = False
 save_model = False
@@ -27,6 +27,13 @@ WORD_EMBEDDING_SIZE = 200 # GLOVE 6B 200d
 # decoder
 TASK_EMBEDDING_SIZE = 128
 DROP_OUT_DE = 0.5
+
+# transformer params
+TRANSFORMER_DECODER_LAYER = 6
+TRANSFORMER_ENCODER_LAYER = 6
+NUM_OF_HEADS = 8
+TRANSFORMER_DROPOUT = 0.1
+EMBEDDING_SIZE = 200
 
 def get_params_dict():
     return {
