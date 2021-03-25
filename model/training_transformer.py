@@ -2,7 +2,7 @@ import sys
 sys.path.append('/home/mlu/code/cr_SGM')
 import torch.nn as nn
 from data.dataset_helper import get_data_iter, TEXT, get_criterion_weight
-from model.Transfomer import Transformer
+from model.Transformer_BI_DECODER import Transformer
 from model.SGM import LabelSmoothing
 from model.evaluation import evaluate
 import torch.optim as optim
@@ -40,7 +40,6 @@ def train(model, optimizer, train_iter, val_iter, num_epochs, data_tag, points):
                 "gcard": batch.gcard.to(DEVICE)
             }
             outputs = model(source, target_dict)
-            # task_loss = [criterion_dict[data_tag][device](outputs[index], target_dict[device]) for index, device in enumerate(DEVICE_ORDER)]
             task_loss = [criterion(outputs[index], target_dict[device]) for index, device in enumerate(DEVICE_ORDER)]
             loss = sum(task_loss)
             training_loss += loss
@@ -87,7 +86,6 @@ def test(model, data_iter, data_tag):
         }
         outputs = model(samples, task_dict)
         output_with_label.append((outputs, task_dict))
-        # task_loss = [criterion_dict[data_tag][device](outputs[index], task_dict[device]) for index, device in enumerate(DEVICE_ORDER)]
         task_loss = [criterion(outputs[index], task_dict[device]) for index, device in enumerate(DEVICE_ORDER)]
         loss = sum(task_loss)
         test_loss += loss
