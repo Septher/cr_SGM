@@ -29,11 +29,12 @@ TASK_EMBEDDING_SIZE = 128
 DROP_OUT_DE = 0.5
 
 # transformer params
-TRANSFORMER_DECODER_LAYER = 6
+TRANSFORMER_DECODER_LAYER = 1
 TRANSFORMER_ENCODER_LAYER = 6
 NUM_OF_HEADS = 8
 TRANSFORMER_DROPOUT = 0.1
 EMBEDDING_SIZE = 200
+ALPHA = 0.6 # balance the loss of forward and backward result
 
 def get_params_dict():
     return {
