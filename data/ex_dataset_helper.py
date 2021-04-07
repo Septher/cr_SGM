@@ -6,10 +6,9 @@ from nltk.corpus import stopwords
 from torchtext.data import Field
 from torchtext import data
 from model.params import BATCH_SIZE_REVIEW, BATCH_SIZE_NEED, DEVICE, DEVICE_ORDER
-from data.label_parser import label_cnt
 
 def load_label():
-    label_path = "processed/labels_parsed.json"
+    label_path = "experiments/labels_parsed.json"
     with open(label_path, "r") as file:
         label = json.load(file)
         file.close()
@@ -19,7 +18,7 @@ columns_name = ["text"] + DEVICE_ORDER
 def label_permutation(label_dict):
     return [label_dict[device] for device in DEVICE_ORDER]
 
-def load_review_data(label_dict):
+def load_review_data(label_dict, threshold):
     raw_review_data_path = "raw/amazon_reviews - IEEE.xlsx"
 
     review_data = []
@@ -31,11 +30,14 @@ def load_review_data(label_dict):
         labels = label_permutation(label_dict[asin])
         for review in raw_reviews:
             if len(review.strip()) > 0:
+                tokens = tokenize(review)
+                # if len(tokens) <= threshold:
+                #     continue
                 d = [review] + labels
                 review_data.append(d)
     return pd.DataFrame(review_data, columns=columns_name)
 
-def load_needs_data(label_dict):
+def load_needs_data(label_dict, threshold):
     raw_needs_path = "raw/needs_byasin (1).csv"
     df = pd.read_csv(raw_needs_path)
     needs_data = []
@@ -46,6 +48,9 @@ def load_needs_data(label_dict):
         labels = label_permutation(label_dict[asin])
         for need in raw_needs:
             if not pd.isnull(need) and len(need.strip()) > 0:
+                tokens = tokenize(need)
+                # if len(tokens) <= threshold:
+                #     continue
                 d = [need] + labels
                 needs_data.append(d)
     return pd.DataFrame(needs_data, columns=columns_name)
@@ -71,7 +76,7 @@ def clean_str(string):
     return string.strip().lower()
 
 def save_as_tsv(df, file_name):
-    path = "processed/%s" % file_name
+    path = "experiments/long/%s" % file_name
     df.to_csv(path, sep='\t', index=False, header=False)
 
 # review data -> 90% train 10% val
@@ -96,66 +101,45 @@ def tokenize(text):
 
 def to_dataset(prefix, fields):
     return data.TabularDataset.splits(
-        path='../data/experiments/short', train='%s_train.tsv' % prefix,
+        path='../data/experiments/short/', train='%s_train.tsv' % prefix,
         validation='%s_val.tsv' % prefix, test='%s_test.tsv' % prefix, format='tsv',
         fields=fields)
 
 def data_prepare():
     label = load_label()
-    reviews_with_label = load_review_data(label)
-    needs_with_label = load_needs_data(label)
+    reviews_with_label = load_review_data(label, 31)
+    needs_with_label = load_needs_data(label, 16)
     dataset_split_and_save(reviews_with_label, [0.9, 0.1, 0.0], "review")
     dataset_split_and_save(needs_with_label, [0.60, 0.2, 0.2], "need")
-
 
 spacy_en = spacy.load("en_core_web_sm")
 TEXT = Field(sequential=True, tokenize=tokenize, lower=True, stop_words=set(stopwords.words('english')))
 LABEL = Field(sequential=False, use_vocab=False)
 fields = [("text", TEXT)] + [(device, LABEL) for device in DEVICE_ORDER]
 
-def get_data_iter():
-    need_train, need_val, need_test = to_dataset("need", fields)
-    review_train, review_val, review_test = to_dataset("review", fields)
+def show(data):
+    texts = [len(tokenize(row["text"])) for _, row in data.iterrows()]
+    texts = sorted(texts, reverse=True)
+    l = int(len(texts) / 2)
+    print(texts[l])
 
-    TEXT.build_vocab(review_train, vectors="glove.6B.200d")
+def data_overview():
+    label = load_label()
+    reviews_with_label = load_review_data(label, 31)
+    needs_with_label = load_needs_data(label, 16)
+    show(reviews_with_label)
+    show(needs_with_label)
 
-    need_train_iter, need_val_iter, need_test_iter = data.Iterator.splits(
-        (need_train, need_val, need_test), sort_key=lambda x: len(x.text),
-        batch_sizes=(BATCH_SIZE_NEED, BATCH_SIZE_NEED, BATCH_SIZE_NEED), device=DEVICE, shuffle=True)
-
-    review_train_iter, review_val_iter, _ = data.Iterator.splits(
-        (review_train, review_val, review_test), sort_key=lambda x: len(x.text),
-        batch_sizes=(BATCH_SIZE_REVIEW, BATCH_SIZE_REVIEW, BATCH_SIZE_REVIEW), device=DEVICE, shuffle=True)
-
-    return review_train_iter, review_val_iter, need_train_iter, need_val_iter, need_test_iter
-
+# data_overview()
 # data_prepare()
 
-def get_criterion_weight():
-    paths = {"need": "../data/processed/need_train.tsv", "review": "../data/processed/review_train.tsv"}
-    # get the distribution of labels for each task
-    num_dict = {"need": {}, "review": {}}
-    for k in ["need", "review"]:
-        df = pd.read_csv(paths[k], sep="\t", names=columns_name)
-        for device in DEVICE_ORDER:
-            num_dict[k][device] = {}
-        for _, row in df.iterrows():
-            for device in DEVICE_ORDER:
-                v = int(row[device])
-                if v not in num_dict[k][device]:
-                    num_dict[k][device][v] = 0
-                num_dict[k][device][v] += 1
-        # print(k)
-        # for device in DEVICE_ORDER:
-        #     print(device + "\t" + str(num_dict[k][device]))
-    # calculate the weight of each label based on the distribution of labels
-    weight_dict = {"need": {}, "review": {}}
-    for device in DEVICE_ORDER:
-        for kd in ["need", "review"]:
-            weights = [0] * label_cnt[device]
-            for k, v in num_dict[kd][device].items():
-                weights[k] = 1.0 / v
-            weight_dict[kd][device] = weights
-    return weight_dict
+def combine(files, out):
+    prefix = ""
+    df_short = pd.read_csv("../data/experiments/short/%s.tsv" % files, sep="\t", names=columns_name)
+    df_long  = pd.read_csv("../data/experiments/long/%s.tsv" % files, sep="\t", names=columns_name)
+    df_out = pd.concat([df_short, df_long])
+    df_out.to_csv("experiments/merged/%s.tsv" % out, sep='\t', index=False, header=False)
 
-# get_criterion_weight()
+combine("review_val", "review_val")
+combine("need_val", "need_val")
+combine("need_test", "need_test")
