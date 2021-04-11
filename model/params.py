@@ -15,7 +15,7 @@ DEVICE_ORDER = ["screen", "cpu", "ram", "hdisk", "gcard"]
 REVERSED_DEVICE_ORDER = DEVICE_ORDER[::-1]
 
 load_model = False
-save_model = False
+save_model = True
 
 # model hyper parameters
 HIDDEN_SIZE = 128
