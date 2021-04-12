@@ -120,7 +120,7 @@ def ex_test(model, data_iter):
         }
         outputs = model(samples, task_dict)
         # (task_cnt, batch)
-        output = [outputs[i].argmax(2) for i in range(5)]
+        output = [outputs[i].argmax(1)g for i in range(5)]
         (_, batch_size) = outputs[0].shape
         for i, device in enumerate(DEVICE_ORDER):
             label = task_dict[device]
