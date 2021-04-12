@@ -130,7 +130,10 @@ def ex_test(model, data_iter):
                 if label[j] == output[i][j]:
                     num_dict[device][v]["correct"] += 1
     model.train()
-    print(num_dict)
+    with open("test_recall.json", "w") as f:
+        import json
+        json.dump(num_dict, f)
+        f.close()
 
 def pipeline():
     if load_model:
