@@ -17,9 +17,6 @@ pad_idx = TEXT.vocab.stoi["<pad>"]
 # criterion = nn.CrossEntropyLoss(ignore_index=pad_idx)
 criterion = LabelSmoothing(smoothing=0.05)
 
-if load_model:
-    load_checkpoint(torch.load("50_no_clip_review_checkpoint.pth.tar"), seq2seq, optimizer)
-
 def train(model, optimizer, train_iter, val_iter, num_epochs, data_tag, points):
     model.train()
     start_stamp = time.time()
@@ -95,13 +92,64 @@ def test(model, data_iter, data_tag):
     model.train()
     return test_loss / sample_cnt, result
 
-draw_points = []
-train(seq2seq, optimizer, review_train_iter, review_val_iter, REVIEW_NUM_EPOCHS, "review", draw_points)
-train(seq2seq, optimizer, need_train_iter, need_val_iter, NEED_NUM_EPOCHS, "need", draw_points)
-_, test_result = test(seq2seq, need_test_iter, "need")
+def ex_test(model, data_iter):
+    label_cnt = {
+        "cpu": 10,
+        "screen": 6,
+        "ram": 6,
+        "hdisk": 10,
+        "gcard": 8
+    }
+    model.eval()
+    num_dict = {}
+    for device in DEVICE_ORDER:
+        num_dict[device] = {}
+        for i in range(label_cnt[device]):
+            num_dict[device][i] = {
+                "correct": 0,
+                "total": 0
+            }
+    for batch_index, batch in enumerate(data_iter):
+        samples = batch.text.to(DEVICE)
+        task_dict = {
+            "cpu": batch.cpu.to(DEVICE),
+            "ram": batch.ram.to(DEVICE),
+            "screen": batch.screen.to(DEVICE),
+            "hdisk": batch.hdisk.to(DEVICE),
+            "gcard": batch.gcard.to(DEVICE)
+        }
+        outputs = model(samples, task_dict)
+        # (task_cnt, batch)
+        output = outputs.argmax(2)
+        (_, batch_size) = output.shape
+        for i, device in enumerate(DEVICE_ORDER):
+            label = task_dict[device]
+            for j in range(batch_size):
+                v = label[j].item()
+                num_dict[device][v]["total"] += 1
+                if label[j] == output[i][j]:
+                    num_dict[device][v]["correct"] += 1
+    model.train()
+    print(num_dict)
 
-checkpoint = {
-    "state_dict": seq2seq.state_dict(),
-    "optimizer": optimizer.state_dict()
-}
-save_all(checkpoint, draw_points, test_result)
+def pipeline():
+    if load_model:
+        load_checkpoint(torch.load("50_no_clip_review_checkpoint.pth.tar"), seq2seq, optimizer)
+    draw_points = []
+    train(seq2seq, optimizer, review_train_iter, review_val_iter, REVIEW_NUM_EPOCHS, "review", draw_points)
+    train(seq2seq, optimizer, need_train_iter, need_val_iter, NEED_NUM_EPOCHS, "need", draw_points)
+    _, test_result = test(seq2seq, need_test_iter, "need")
+
+    checkpoint = {
+        "state_dict": seq2seq.state_dict(),
+        "optimizer": optimizer.state_dict()
+    }
+    save_all(checkpoint, draw_points, test_result)
+
+def ex_pipeline():
+    if load_model:
+        load_checkpoint(torch.load("50_no_clip_review_checkpoint.pth.tar"), seq2seq, optimizer)
+    ex_test(seq2seq, need_test_iter)
+
+ex_pipeline()
+

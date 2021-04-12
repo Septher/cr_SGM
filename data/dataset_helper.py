@@ -131,23 +131,29 @@ def get_data_iter():
 
 # data_prepare()
 
-def get_criterion_weight():
+# distribution in the training data
+def get_label_distribution():
     paths = {"need": "../data/processed/need_train.tsv", "review": "../data/processed/review_train.tsv"}
     # get the distribution of labels for each task
-    num_dict = {"need": {}, "review": {}}
+    num_dict = {"need": {}, "review": {}, "total": {}}
+    for device in DEVICE_ORDER:
+        for k in ["need", "review", "total"]:
+            num_dict[k][device] = 0
     for k in ["need", "review"]:
         df = pd.read_csv(paths[k], sep="\t", names=columns_name)
-        for device in DEVICE_ORDER:
-            num_dict[k][device] = {}
         for _, row in df.iterrows():
             for device in DEVICE_ORDER:
                 v = int(row[device])
                 if v not in num_dict[k][device]:
                     num_dict[k][device][v] = 0
                 num_dict[k][device][v] += 1
-        # print(k)
-        # for device in DEVICE_ORDER:
-        #     print(device + "\t" + str(num_dict[k][device]))
+                num_dict["total"][device][v] += 1
+    return num_dict
+
+def get_criterion_weight():
+    paths = {"need": "../data/processed/need_train.tsv", "review": "../data/processed/review_train.tsv"}
+    # get the distribution of labels for each task
+    num_dict = get_label_distribution()
     # calculate the weight of each label based on the distribution of labels
     weight_dict = {"need": {}, "review": {}}
     for device in DEVICE_ORDER:
@@ -158,4 +164,10 @@ def get_criterion_weight():
             weight_dict[kd][device] = weights
     return weight_dict
 
-# get_criterion_weight()
+# The relationship between recall and training sample size
+def draw_picture():
+    num_dict = get_label_distribution()
+
+
+
+# draw_picture()
