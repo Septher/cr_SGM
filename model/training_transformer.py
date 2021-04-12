@@ -109,6 +109,7 @@ def ex_test(model, data_iter):
                 "correct": 0,
                 "total": 0
             }
+    ans = []
     for batch_index, batch in enumerate(data_iter):
         samples = batch.text.to(DEVICE)
         task_dict = {
@@ -125,14 +126,14 @@ def ex_test(model, data_iter):
         for i, device in enumerate(DEVICE_ORDER):
             label = task_dict[device]
             for j in range(batch_size):
-                v = label[j].item()
-                num_dict[device][v]["total"] += 1
-                if label[j] == output[i][j]:
-                    num_dict[device][v]["correct"] += 1
+                ans.append((device, output[i][j].item(), label[j].item()))
     model.train()
-    with open("test_recall.json", "w") as f:
+    out = {
+        "ans": ans
+    }
+    with open("test_output.json", "w") as f:
         import json
-        json.dump(num_dict, f)
+        json.dump(out, f)
         f.close()
 
 def pipeline():

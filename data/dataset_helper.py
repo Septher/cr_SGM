@@ -7,6 +7,9 @@ from torchtext.data import Field
 from torchtext import data
 from model.params import BATCH_SIZE_REVIEW, BATCH_SIZE_NEED, DEVICE, DEVICE_ORDER
 from data.label_parser import label_cnt
+import seaborn as sns
+import matplotlib.pyplot as plt
+
 
 def load_label():
     label_path = "processed/labels_parsed.json"
@@ -138,14 +141,14 @@ def get_label_distribution():
     num_dict = {"need": {}, "review": {}, "total": {}}
     for device in DEVICE_ORDER:
         for k in ["need", "review", "total"]:
-            num_dict[k][device] = 0
+            num_dict[k][device] = {}
+            for i in range(label_cnt[device]):
+                num_dict[k][device][i] = 0
     for k in ["need", "review"]:
         df = pd.read_csv(paths[k], sep="\t", names=columns_name)
         for _, row in df.iterrows():
             for device in DEVICE_ORDER:
                 v = int(row[device])
-                if v not in num_dict[k][device]:
-                    num_dict[k][device][v] = 0
                 num_dict[k][device][v] += 1
                 num_dict["total"][device][v] += 1
     return num_dict
@@ -166,8 +169,45 @@ def get_criterion_weight():
 
 # The relationship between recall and training sample size
 def draw_picture():
+    label_cnt = {
+        "cpu": 10,
+        "screen": 6,
+        "ram": 6,
+        "hdisk": 10,
+        "gcard": 8
+    }
     num_dict = get_label_distribution()
+    data_points = []
+    with open("test_recall.json", "r") as f:
+        import json
+        test_recall_dict = json.load(f)
+        f.close()
+        for device in DEVICE_ORDER:
+            for i in range(label_cnt[device]):
+                data_points.append((
+                    int(num_dict["need"][device][i]),
+                    0 if test_recall_dict[device][str(i)]["total"] == 0 else 1.0 * test_recall_dict[device][str(i)]["correct"] / test_recall_dict[device][str(i)]["total"],
+                    i,
+                    device
+                ))
+    df = pd.DataFrame(data_points, columns=["sample_cnt", "recall", "label_id", "device"])
+    sns.set_theme(style="whitegrid")
+    # Draw a categorical scatterplot to show each observation
+    # ax = sns.swarmplot(data=df, x="sample_cnt", y="recall", hue="device", size=5)
+    # ax.set(ylabel="", xlabel="")
+    # ticks = ax.get_xticks()
+    # labels = ax.get_xticklabels()
+    # ax.set_xticks(ticks[4::5])
+    # ax.set_xticklabels(labels[4::5])
+    # ax.set_yticks([0, 1])
+    sns.scatterplot(
+        data=df,
+        x="sample_cnt",
+        y="recall",
+        hue="device"
+    )
 
-
+    #    ax.set(xlim=(0, 500), ylim=(0.0, 1.0))
+    plt.show()
 
 # draw_picture()
