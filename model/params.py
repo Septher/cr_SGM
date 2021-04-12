@@ -14,8 +14,8 @@ DEVICE = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 DEVICE_ORDER = ["screen", "cpu", "ram", "hdisk", "gcard"]
 REVERSED_DEVICE_ORDER = DEVICE_ORDER[::-1]
 
-load_model = False
-save_model = True
+load_model = True
+save_model = False
 
 # model hyper parameters
 HIDDEN_SIZE = 128

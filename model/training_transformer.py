@@ -134,7 +134,7 @@ def ex_test(model, data_iter):
 
 def pipeline():
     if load_model:
-        load_checkpoint(torch.load("50_no_clip_review_checkpoint.pth.tar"), seq2seq, optimizer)
+        load_checkpoint(torch.load("04-11-20-17.pth.tar"), seq2seq, optimizer)
     draw_points = []
     train(seq2seq, optimizer, review_train_iter, review_val_iter, REVIEW_NUM_EPOCHS, "review", draw_points)
     train(seq2seq, optimizer, need_train_iter, need_val_iter, NEED_NUM_EPOCHS, "need", draw_points)
@@ -148,7 +148,7 @@ def pipeline():
 
 def ex_pipeline():
     if load_model:
-        load_checkpoint(torch.load("50_no_clip_review_checkpoint.pth.tar"), seq2seq, optimizer)
+        load_checkpoint(torch.load("04-11-20-17.pth.tar"), seq2seq, optimizer)
     ex_test(seq2seq, need_test_iter)
 
 ex_pipeline()
