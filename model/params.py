@@ -14,7 +14,7 @@ DEVICE = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 DEVICE_ORDER = ["screen", "cpu", "ram", "hdisk", "gcard"]
 REVERSED_DEVICE_ORDER = DEVICE_ORDER[::-1]
 
-load_model = False
+load_model = True
 save_model = False
 
 # seq2seq hyper parameters

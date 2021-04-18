@@ -1,7 +1,7 @@
 import sys
 sys.path.append('/home/mlu/code/cr_SGM')
 import torch.nn as nn
-from data.dataset_helper import get_data_iter, TEXT, get_criterion_weight
+from data.dataset_helper import get_data_iter, TEXT, get_fine_tune_iter
 from model.Transformer_BI_DECODER import Transformer
 from model.SGM import LabelSmoothing
 from model.evaluation import evaluate
@@ -18,7 +18,7 @@ pad_idx = TEXT.vocab.stoi["<pad>"]
 criterion = LabelSmoothing(smoothing=0.05)
 
 if load_model:
-    load_checkpoint(torch.load("50_no_clip_review_checkpoint.pth.tar"), seq2seq, optimizer)
+    load_checkpoint(torch.load("../result/saved_model/06-03-21-51.pth.tar"), seq2seq, optimizer)
 
 def train(model, optimizer, train_iter, val_iter, num_epochs, data_tag, points):
     model.train()
@@ -71,6 +71,38 @@ def train(model, optimizer, train_iter, val_iter, num_epochs, data_tag, points):
     load_checkpoint(checkpoint, model, optimizer)
     print("best steps: %d, min val loss: %.4f" % (best_steps, min_val_loss))
 
+def train_no_val(model, optimizer, train_iter, num_epochs, data_tag):
+    model.train()
+    start_stamp = time.time()
+    steps = 0
+    for epoch in range(num_epochs):
+        train_iter.init_epoch()
+        training_loss, sample_cnt = 0.0, 0
+        print(f"[{data_tag} Epoch {epoch} / {num_epochs}]")
+
+        for batch_index, batch in enumerate(train_iter, 1):
+            source = batch.text.to(DEVICE)
+            target_dict = {
+                "cpu": batch.cpu.to(DEVICE),
+                "ram": batch.ram.to(DEVICE),
+                "screen": batch.screen.to(DEVICE),
+                "hdisk": batch.hdisk.to(DEVICE),
+                "gcard": batch.gcard.to(DEVICE)
+            }
+            outputs = model(source, target_dict)
+            task_loss = [criterion(outputs[index], target_dict[device]) for index, device in enumerate(DEVICE_ORDER)]
+            loss = sum(task_loss)
+            training_loss += loss
+            sample_cnt += outputs[0].shape[0]
+
+            optimizer.zero_grad()
+            loss.backward()
+            torch.nn.utils.clip_grad_norm_(model.parameters(), max_norm=1)
+            optimizer.step()
+            steps += 1
+    cost = int(time.time() - start_stamp)
+    print("training time cost: {} min {} sec".format(int(cost / 60), cost % 60))
+
 def test(model, data_iter, data_tag):
     model.eval()
     output_with_label = []
@@ -95,10 +127,57 @@ def test(model, data_iter, data_tag):
     model.train()
     return test_loss / sample_cnt, result
 
+# draw_points = []
+# train(seq2seq, optimizer, review_train_iter, review_val_iter, REVIEW_NUM_EPOCHS, "review", draw_points)
+# train(seq2seq, optimizer, need_train_iter, need_val_iter, NEED_NUM_EPOCHS, "need", draw_points)
+# _, test_result = test(seq2seq, need_test_iter, "need")
+
+# fine tune
+# frozen all params
+for param in seq2seq.parameters():
+    param.requires_grad = False
+
+# replace the last layer and embedding layer
+seq2seq.scr_classifier = nn.Linear(EMBEDDING_SIZE, 6)
+seq2seq.cpu_classifier = nn.Linear(EMBEDDING_SIZE, 10)
+seq2seq.ram_classifier = nn.Linear(EMBEDDING_SIZE, 6)
+seq2seq.hdk_classifier = nn.Linear(EMBEDDING_SIZE, 10)
+seq2seq.gcd_classifier = nn.Linear(EMBEDDING_SIZE, 9)
+seq2seq.classifier = {
+    "screen": seq2seq.scr_classifier,
+    "cpu": seq2seq.cpu_classifier,
+    "ram": seq2seq.ram_classifier,
+    "hdisk": seq2seq.hdk_classifier,
+    "gcard": seq2seq.gcd_classifier
+}
+
+seq2seq.scr_embedding = nn.Embedding(6, EMBEDDING_SIZE)
+seq2seq.cpu_embedding = nn.Embedding(10, EMBEDDING_SIZE)
+seq2seq.ram_embedding = nn.Embedding(6, EMBEDDING_SIZE)
+seq2seq.hdk_embedding = nn.Embedding(10, EMBEDDING_SIZE)
+seq2seq.gcd_embedding = nn.Embedding(9, EMBEDDING_SIZE)
+seq2seq.task_embedding = {
+    "init": seq2seq.ini_embedding,
+    "screen": seq2seq.scr_embedding,
+    "cpu": seq2seq.cpu_embedding,
+    "ram": seq2seq.ram_embedding,
+    "hdisk": seq2seq.hdk_embedding,
+    "gcard": seq2seq.gcd_embedding
+}
+
+# init weight
+nn.init.xavier_normal_(seq2seq.scr_classifier.weight)
+nn.init.xavier_normal_(seq2seq.cpu_classifier.weight)
+nn.init.xavier_normal_(seq2seq.ram_classifier.weight)
+nn.init.xavier_normal_(seq2seq.hdk_classifier.weight)
+nn.init.xavier_normal_(seq2seq.gcd_classifier.weight)
+
+optimizer = optim.Adam(seq2seq.parameters(), lr=LEARNING_RATE)
+
 draw_points = []
-train(seq2seq, optimizer, review_train_iter, review_val_iter, REVIEW_NUM_EPOCHS, "review", draw_points)
-train(seq2seq, optimizer, need_train_iter, need_val_iter, NEED_NUM_EPOCHS, "need", draw_points)
-_, test_result = test(seq2seq, need_test_iter, "need")
+fine_tune_train_iter, fine_tune_val_iter, fine_tune_test_iter = get_fine_tune_iter()
+train(seq2seq, optimizer, fine_tune_train_iter, fine_tune_val_iter, 50, "fine_tune_need", draw_points)
+_, test_result = test(seq2seq, fine_tune_test_iter, "fine_tune_need")
 
 checkpoint = {
     "state_dict": seq2seq.state_dict(),

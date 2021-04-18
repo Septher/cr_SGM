@@ -9,7 +9,28 @@ def evaluate(output_with_label, data_tag):
         labels = torch.cat([label_dict[device] for _, label_dict in output_with_label], dim=0)
         result[device] = calculate(outputs, labels)
     show_result(result, data_tag)
+#     save_confusion_matrix(output_with_label)
     return result
+
+def save_confusion_matrix(output_with_label):
+    result = {}
+    for index, device in enumerate(DEVICE_ORDER):
+        outputs = torch.cat([output[index] for output, _ in output_with_label], dim=0)
+        labels = torch.cat([label_dict[device] for _, label_dict in output_with_label], dim=0)
+        indices = torch.argmax(outputs, dim=1)
+        sample_cnt = outputs.size()[0]
+        device_result = {}
+        for i in range(sample_cnt):
+            actual = labels[i].item()
+            pred = indices[i].item()
+            actual_dict = device_result.get(actual, {})
+            actual_dict[pred] = actual_dict.get(pred, 0) + 1
+            device_result[actual] = actual_dict
+        result[device] = device_result
+    import json
+    with open("../result/confusion_matrix.json", "w") as outfile:
+        json.dump(result, outfile)
+        outfile.close()
 
 log2 = [1.0 / math.log2(k + 2) for k in range(K)]
 def calculate(outputs, labels):

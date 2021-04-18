@@ -9,13 +9,15 @@ label_cnt = {
     "hdisk": 10,
     "gcard": 8
 }
+
 def load_label():
-    raw_label_path = "raw/labels for the laptop (specifications).xlsx"
     label_dict_path = "processed/label_dict.json"
-    df = pd.read_excel(raw_label_path, sheet_name="spec", engine="openpyxl")
+    df1 = pd.read_excel("raw/labels for the laptop (specifications).xlsx", sheet_name="spec", engine="openpyxl")
+    df2 = pd.read_excel("raw/laptop 2018 and 19 new.xlsx", sheet_name="specifications", engine="openpyxl")
+    df = pd.concat([df1, df2], axis=1)
     raw_label = dict()
     for index, asin in enumerate(df):
-        if index == 0:
+        if asin.upper() == "ASIN":
             continue
         spec = df[asin]
         raw_label[asin] = {
@@ -57,7 +59,7 @@ def get_cpu_id(company, freq, gen):
         if freq < 3.0:
             return 1
         return 2
-    if company == "INTEL" and (gen is not None and gen[0] == "I"):
+    if gen is not None and gen[0] == "I":
         if gen[1] == "3":
             return 3 if freq < 2.4 else 4
         if gen[1] == "5":
@@ -126,7 +128,7 @@ def get_hdisk_id(size, tp):
     return 9
 
 def parse_hdisk_label(raw_hdisk):
-    sz_pattern = "(\d+) (G|T)B?"
+    sz_pattern = "(\d+) ?(G|T)B?"
     hdisk_dict = dict()
     for hdisk in raw_hdisk:
         s = hdisk.upper()
@@ -139,10 +141,14 @@ def parse_hdisk_label(raw_hdisk):
         hdisk_dict[hdisk] = get_hdisk_id(size, tp)
     return hdisk_dict
 
-# [0, 7]
+# [0, 8]
 def get_gcard_id(company, series, num):
     if company == "NVIDIA" or series == "GTX":
-        return 0 if num is not None and int(num) >= 1000 else 1
+        if num is None or int(num) < 1000:
+            return 1
+        if int(num) < 1100:
+            return 0
+        return 8
     if company == "INTEL" or series == "INTEGRATED":
         if num is None or series == "INTEGRATED":
             return 4
@@ -187,6 +193,5 @@ def parse_label(raw_label):
         json.dump(raw_label, outfile)
         outfile.close()
 
-# if __name__ == '__main__':
-#     raw_label = load_label()
-#     parse_label(raw_label)
+# raw_label = load_label()
+# parse_label(raw_label)

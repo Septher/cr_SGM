@@ -37,7 +37,8 @@ def show_cat_plot(data, title):
 
 
 columns = ["description", "criterion", "score"]
-files = ["bi-LSTM-no-decoder", "seq2seq", "transformer", "transformer-params-sharing", "seq2seq+bi-decoder", "transformer-bi-decoder-1-layer"]
+# files = ["bi-LSTM-no-decoder", "seq2seq", "transformer", "transformer-params-sharing", "seq2seq+bi-decoder", "transformer-bi-decoder-1-layer"]
+files = ["transformer-bi-decoder-1-layer", "no_fine_tune", "transformer_fine_tune_new", "transformer_fine_tune_old"]
 def show_test_recall():
     sns.set_theme(style="whitegrid")
     data_points = {}
@@ -54,4 +55,35 @@ def show_test_recall():
     for device in terms:
         show_cat_plot(data_points[device], device)
 
-show_result()
+# show_result()
+
+def show_confusion_matrix():
+    with open("confusion_matrix.json", "r") as file:
+        cm = json.load(file)["gcard"]
+        file.close()
+    print(cm)
+    confusion_matrix = []
+    for i in range(9):
+        out = [(i, j, cm.get(str(i), {}).get(str(j), 0)) for j in range(9)]
+        confusion_matrix.extend(out)
+    df = DataFrame(data=confusion_matrix, columns=["True Label", "Predicted Label", "count"])
+    df = df.pivot("True Label", "Predicted Label", "count")
+    ax = sns.heatmap(df, cmap="YlGnBu", annot=True)
+    plt.show()
+
+# show_confusion_matrix()
+
+def read_result(path):
+    with open(path, "r") as file:
+        result = json.load(file)
+        file.close()
+        for k in ["screen", "cpu", "ram", "hdisk", "gcard"]:
+            print(k)
+            for c in ["recall", "precision", "nDCG"]:
+                print(c)
+                for i in range(1, 6):
+                    v = "%.4f" % (result[k]["%s@%d" % (c, i)] * 0.01)
+                    print(float(v))
+
+# read_result("processed_test_result/transformer + bi-decoder + long samples.json")
+# read_result("processed_test_result/transformer + bi-decoder + short samples.json")

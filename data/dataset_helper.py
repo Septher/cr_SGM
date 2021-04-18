@@ -7,6 +7,7 @@ from torchtext.data import Field
 from torchtext import data
 from model.params import BATCH_SIZE_REVIEW, BATCH_SIZE_NEED, DEVICE, DEVICE_ORDER
 from data.label_parser import label_cnt
+# import nlpaug.augmenter.word as naw
 
 def load_label():
     label_path = "processed/labels_parsed.json"
@@ -15,7 +16,15 @@ def load_label():
         file.close()
     return label
 
+def tokenize(text):
+    return [tok.text for tok in spacy_en.tokenizer(clean_str(text))]
+
 columns_name = ["text"] + DEVICE_ORDER
+spacy_en = spacy.load("en_core_web_sm")
+TEXT = Field(sequential=True, tokenize=tokenize, lower=True, stop_words=set(stopwords.words('english')))
+LABEL = Field(sequential=False, use_vocab=False)
+fields = [("text", TEXT)] + [(device, LABEL) for device in DEVICE_ORDER]
+
 def label_permutation(label_dict):
     return [label_dict[device] for device in DEVICE_ORDER]
 
@@ -87,31 +96,26 @@ def dataset_split_and_save(samples, ratio, prefix):
     val_cnt = int(n * ratio[1])
     test_cnt = n - train_cnt - val_cnt
     print("%s data: train_cnt: %d, val_cnt: %d, test_cnt: %d" % (prefix, train_cnt, val_cnt, test_cnt))
+#     save_as_tsv(data_argument(samples[:train_cnt]).sample(frac=1), prefix + "_train.tsv")
     save_as_tsv(samples[:train_cnt], prefix + "_train.tsv")
     save_as_tsv(samples[train_cnt: train_cnt + val_cnt], prefix + "_val.tsv")
     save_as_tsv(samples[-test_cnt:], prefix + "_test.tsv")
 
-def tokenize(text):
-    return [tok.text for tok in spacy_en.tokenizer(clean_str(text))]
+# def data_argument(df):
+#     aug = naw.SynonymAug(aug_src='wordnet')
+#     argument_data = []
+#     for _, row in df.iterrows():
+#         label = [row[device] for device in DEVICE_ORDER]
+#         texts = [row["text"]] + aug.augment(row["text"], n=2)
+#         for text in texts:
+#             argument_data.append([text] + label)
+#     return pd.DataFrame(argument_data, columns=columns_name)
 
 def to_dataset(prefix, fields):
     return data.TabularDataset.splits(
         path='../data/processed/', train='%s_train.tsv' % prefix,
         validation='%s_val.tsv' % prefix, test='%s_test.tsv' % prefix, format='tsv',
         fields=fields)
-
-def data_prepare():
-    label = load_label()
-    reviews_with_label = load_review_data(label)
-    needs_with_label = load_needs_data(label)
-    dataset_split_and_save(reviews_with_label, [0.9, 0.1, 0.0], "review")
-    dataset_split_and_save(needs_with_label, [0.60, 0.2, 0.2], "need")
-
-
-spacy_en = spacy.load("en_core_web_sm")
-TEXT = Field(sequential=True, tokenize=tokenize, lower=True, stop_words=set(stopwords.words('english')))
-LABEL = Field(sequential=False, use_vocab=False)
-fields = [("text", TEXT)] + [(device, LABEL) for device in DEVICE_ORDER]
 
 def get_data_iter():
     need_train, need_val, need_test = to_dataset("need", fields)
@@ -128,6 +132,43 @@ def get_data_iter():
         batch_sizes=(BATCH_SIZE_REVIEW, BATCH_SIZE_REVIEW, BATCH_SIZE_REVIEW), device=DEVICE, shuffle=True)
 
     return review_train_iter, review_val_iter, need_train_iter, need_val_iter, need_test_iter
+
+def get_fine_tune_iter():
+    fine_tune_train, fine_tune_val, fine_tune_test = to_dataset("fine_tune_need", fields)
+    return data.Iterator.splits(
+        (fine_tune_train, fine_tune_val, fine_tune_test), sort_key=lambda x: len(x.text),
+        batch_sizes=(BATCH_SIZE_NEED, BATCH_SIZE_NEED, BATCH_SIZE_NEED), device=DEVICE, shuffle=True)
+
+def data_prepare():
+    label = load_label()
+    # reviews_with_label = load_review_data(label)
+    # needs_with_label = load_needs_data(label)
+    # need data from 2018 ~ 2019
+    fine_tune_needs_with_label = load_fine_tune_needs_data(label)
+    # dataset_split_and_save(reviews_with_label, [0.9, 0.1, 0.0], "review")
+    # dataset_split_and_save(needs_with_label, [0.6, 0.2, 0.2], "need")
+    dataset_split_and_save(fine_tune_needs_with_label, [0.4, 0.3, 0.3], "fine_tune_need")
+
+def load_fine_tune_needs_data(label_dict):
+    dfs = pd.read_excel("raw/laptop 2018 and 19 new.xlsx", sheet_name=None, engine="openpyxl")
+#     aug = naw.SynonymAug(aug_src='wordnet')
+    needs_data = []
+    for asin, df in dfs.items():
+        if asin == "specifications":
+            continue
+        if asin not in label_dict:
+            print("asin: %s has no specifications" % asin)
+            continue
+        labels = label_permutation(label_dict[asin])
+        for index, data in df.iterrows():
+            need = data["generated needs using the keywords"]
+            if index > 0 and not pd.isnull(need) and len(need.strip()) > 0:
+                d = [need] + labels
+                needs_data.append(d)
+                # aug_texts = aug.augment(need, n=3)
+                # for text in aug_texts:
+                #     needs_data.append([text] + labels)
+    return pd.DataFrame(needs_data, columns=columns_name)
 
 # data_prepare()
 
