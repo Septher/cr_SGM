@@ -37,7 +37,8 @@ def show_cat_plot(data, title):
 
 
 columns = ["description", "criterion", "score"]
-files = ["bi-LSTM-no-decoder", "seq2seq", "transformer", "transformer-params-sharing", "seq2seq+bi-decoder", "transformer-bi-decoder-1-layer"]
+# files = ["bi-LSTM-no-decoder", "seq2seq", "transformer", "transformer-params-sharing", "seq2seq+bi-decoder", "transformer-bi-decoder-1-layer"]
+files = ["transformer-bi-decoder-1-layer", "no_fine_tune", "transformer_fine_tune_new", "transformer_fine_tune_old"]
 def show_test_recall():
     sns.set_theme(style="whitegrid")
     data_points = {}
