@@ -7,7 +7,7 @@ from torchtext.data import Field
 from torchtext import data
 from model.params import BATCH_SIZE_REVIEW, BATCH_SIZE_NEED, DEVICE, DEVICE_ORDER
 from data.label_parser import label_cnt
-import nlpaug.augmenter.word as naw
+# import nlpaug.augmenter.word as naw
 
 def load_label():
     label_path = "processed/labels_parsed.json"
@@ -96,19 +96,20 @@ def dataset_split_and_save(samples, ratio, prefix):
     val_cnt = int(n * ratio[1])
     test_cnt = n - train_cnt - val_cnt
     print("%s data: train_cnt: %d, val_cnt: %d, test_cnt: %d" % (prefix, train_cnt, val_cnt, test_cnt))
-    save_as_tsv(data_argument(samples[:train_cnt]).sample(frac=1), prefix + "_train.tsv")
+#     save_as_tsv(data_argument(samples[:train_cnt]).sample(frac=1), prefix + "_train.tsv")
+    save_as_tsv(samples[:train_cnt], prefix + "_train.tsv")
     save_as_tsv(samples[train_cnt: train_cnt + val_cnt], prefix + "_val.tsv")
     save_as_tsv(samples[-test_cnt:], prefix + "_test.tsv")
 
-def data_argument(df):
-    aug = naw.SynonymAug(aug_src='wordnet')
-    argument_data = []
-    for _, row in df.iterrows():
-        label = [row[device] for device in DEVICE_ORDER]
-        texts = [row["text"]] + aug.augment(row["text"], n=2)
-        for text in texts:
-            argument_data.append([text] + label)
-    return pd.DataFrame(argument_data, columns=columns_name)
+# def data_argument(df):
+#     aug = naw.SynonymAug(aug_src='wordnet')
+#     argument_data = []
+#     for _, row in df.iterrows():
+#         label = [row[device] for device in DEVICE_ORDER]
+#         texts = [row["text"]] + aug.augment(row["text"], n=2)
+#         for text in texts:
+#             argument_data.append([text] + label)
+#     return pd.DataFrame(argument_data, columns=columns_name)
 
 def to_dataset(prefix, fields):
     return data.TabularDataset.splits(
@@ -169,7 +170,7 @@ def load_fine_tune_needs_data(label_dict):
                 #     needs_data.append([text] + labels)
     return pd.DataFrame(needs_data, columns=columns_name)
 
-data_prepare()
+# data_prepare()
 
 def get_criterion_weight():
     paths = {"need": "../data/processed/need_train.tsv", "review": "../data/processed/review_train.tsv"}
