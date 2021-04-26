@@ -170,8 +170,8 @@ draw_points = []
 # train(seq2seq, optimizer, need_train_iter, need_val_iter, NEED_NUM_EPOCHS, "need", draw_points)
 # _, test_result = test(seq2seq, need_test_iter, "need")
 fine_tune_train_iter, fine_tune_val_iter, fine_tune_test_iter = get_fine_tune_iter()
-# train(seq2seq, optimizer, fine_tune_train_iter, fine_tune_val_iter, 50, "fine_tune_need", draw_points)
-train_no_val(seq2seq, optimizer, fine_tune_train_iter, 50, "fine_tune_need")
+train(seq2seq, optimizer, fine_tune_train_iter, fine_tune_val_iter, 50, "fine_tune_need", draw_points)
+# train_no_val(seq2seq, optimizer, fine_tune_train_iter, 50, "fine_tune_need")
 _, test_result = test(seq2seq, fine_tune_test_iter, "fine_tune_need")
 
 checkpoint = {

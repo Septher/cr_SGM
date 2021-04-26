@@ -7,7 +7,7 @@ from torchtext.data import Field
 from torchtext import data
 from model.params import BATCH_SIZE_REVIEW, BATCH_SIZE_NEED, DEVICE, DEVICE_ORDER
 from data.label_parser import label_cnt
-# import nlpaug.augmenter.word as naw
+import nlpaug.augmenter.word as naw
 
 def load_label():
     label_path = "processed/labels_parsed.json"
@@ -96,9 +96,19 @@ def dataset_split_and_save(samples, ratio, prefix):
     val_cnt = int(n * ratio[1])
     test_cnt = n - train_cnt - val_cnt
     print("%s data: train_cnt: %d, val_cnt: %d, test_cnt: %d" % (prefix, train_cnt, val_cnt, test_cnt))
-    save_as_tsv(samples[:train_cnt], prefix + "_train.tsv")
+    save_as_tsv(data_argument(samples[:train_cnt]).sample(frac=1), prefix + "_train.tsv")
     save_as_tsv(samples[train_cnt: train_cnt + val_cnt], prefix + "_val.tsv")
     save_as_tsv(samples[-test_cnt:], prefix + "_test.tsv")
+
+def data_argument(df):
+    aug = naw.SynonymAug(aug_src='wordnet')
+    argument_data = []
+    for _, row in df.iterrows():
+        label = [row[device] for device in DEVICE_ORDER]
+        texts = [row["text"]] + aug.augment(row["text"], n=2)
+        for text in texts:
+            argument_data.append([text] + label)
+    return pd.DataFrame(argument_data, columns=columns_name)
 
 def to_dataset(prefix, fields):
     return data.TabularDataset.splits(
@@ -136,7 +146,7 @@ def data_prepare():
     fine_tune_needs_with_label = load_fine_tune_needs_data(label)
     # dataset_split_and_save(reviews_with_label, [0.9, 0.1, 0.0], "review")
     # dataset_split_and_save(needs_with_label, [0.6, 0.2, 0.2], "need")
-    dataset_split_and_save(fine_tune_needs_with_label, [0.7, 0.0, 0.3], "fine_tune_need")
+    dataset_split_and_save(fine_tune_needs_with_label, [0.4, 0.3, 0.3], "fine_tune_need")
 
 def load_fine_tune_needs_data(label_dict):
     dfs = pd.read_excel("raw/laptop 2018 and 19 new.xlsx", sheet_name=None, engine="openpyxl")
@@ -146,7 +156,7 @@ def load_fine_tune_needs_data(label_dict):
         if asin == "specifications":
             continue
         if asin not in label_dict:
-            print(asin)
+            print("asin: %s has no specifications" % asin)
             continue
         labels = label_permutation(label_dict[asin])
         for index, data in df.iterrows():
@@ -159,7 +169,7 @@ def load_fine_tune_needs_data(label_dict):
                 #     needs_data.append([text] + labels)
     return pd.DataFrame(needs_data, columns=columns_name)
 
-# data_prepare()
+data_prepare()
 
 def get_criterion_weight():
     paths = {"need": "../data/processed/need_train.tsv", "review": "../data/processed/review_train.tsv"}
