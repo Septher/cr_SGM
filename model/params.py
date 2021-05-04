@@ -17,14 +17,14 @@ REVERSED_DEVICE_ORDER = DEVICE_ORDER[::-1]
 load_model = False
 save_model = False
 
-# model hyper parameters
+# seq2seq hyper parameters
 HIDDEN_SIZE = 128
 NUM_LAYERS = 2
 TEACHER_FORCE = 0.5
-# encoder
+# seq2seq encoder
 DROP_OUT_EN = 0.5
 WORD_EMBEDDING_SIZE = 200 # GLOVE 6B 200d
-# decoder
+# seq2seq decoder
 TASK_EMBEDDING_SIZE = 128
 DROP_OUT_DE = 0.5
 
@@ -34,7 +34,6 @@ TRANSFORMER_ENCODER_LAYER = 6
 NUM_OF_HEADS = 8
 TRANSFORMER_DROPOUT = 0.1
 EMBEDDING_SIZE = 200
-ALPHA = 0.6 # balance the loss of forward and backward result
 
 def get_params_dict():
     return {
