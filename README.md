@@ -58,3 +58,18 @@ step 3: run command python training_transformer.py
 | NUM_OF_HEADS | number of transformer heads |
 | TRANSFORMER_DROPOUT | dropout of transformer |
 | EMBEDDING_SIZE | word embedding size of transformer |
+
+|  experiments   | description  |
+|  ----  | ----  |
+| bi-LSTM-no-decoder | previous baseline |
+| seq2seq | seq2seq model baseline |
+| seq2seq+bi-decoder | seq2seq with bidirectional decoder |
+| seq2seq + bi-decoder + long samples | experiment for long samples |
+| seq2seq + bi-decoder + short samples | experiment for short samples |
+| transformer | transformer baseline |
+| transformer-1-layer-bi-decoder | transformer with bidirectional mask and use only 1 layer decoder to avoid information leaking|
+| transformer + bi-decoder + long samples | experiment for long samples |
+| transformer + bi-decoder + short samples | experiment for short samples |
+| fine_tune | fine tune new data with no new label by using transformer with bidirectional mask |
+| fine_tune + data argumentation(only training set X3) | fine tune new data with new label by using transformer with bidirectional mask and apply data argumentation on training set to get 3 times the number of samples|
+| fine_tune + 3X data argumentation | fine tune new data with new label by using transformer with bidirectional mask and apply data argumentation on the whole dataset to get 3 times the number of samples |
