@@ -51,7 +51,7 @@ def train(model, optimizer, train_iter, val_iter, num_epochs, data_tag, points):
             optimizer.step()
             steps += 1
             if steps % steps_cut == 0:
-                val_loss, val_result = test(model, val_iter, data_tag)
+                val_loss, val_result, _ = test(model, val_iter, data_tag)
                 if checkpoint is None or min_val_loss > val_loss:
                     min_val_loss = val_loss
                     best_steps = steps
@@ -92,17 +92,17 @@ def test(model, data_iter, data_tag):
         sample_cnt += outputs[0].shape[0]
 
     result = evaluate(output_with_label, data_tag)
-    recall_result = output_info(output_with_label)
+    # recall_result = output_info(output_with_label)
     model.train()
-    return test_loss / sample_cnt, result, recall_result
+    return test_loss / sample_cnt, result, None
 
 draw_points = []
 train(seq2seq, optimizer, review_train_iter, review_val_iter, REVIEW_NUM_EPOCHS, "review", draw_points)
 train(seq2seq, optimizer, need_train_iter, need_val_iter, NEED_NUM_EPOCHS, "need", draw_points)
-_, test_result, recall_result = test(seq2seq, need_test_iter, "need")
+_, test_result, _ = test(seq2seq, need_test_iter, "need")
 
 checkpoint = {
     "state_dict": seq2seq.state_dict(),
     "optimizer": optimizer.state_dict()
 }
-save_all(checkpoint, draw_points, test_result, recall_result)
+save_all(checkpoint, draw_points, test_result, None)
