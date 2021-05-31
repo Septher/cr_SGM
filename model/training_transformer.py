@@ -4,7 +4,7 @@ import torch.nn as nn
 from data.dataset_helper import get_data_iter, TEXT, get_criterion_weight
 from model.Transformer_BI_DECODER import Transformer
 from model.SGM import LabelSmoothing
-from model.evaluation import evaluate
+from model.evaluation import evaluate, output_info
 import torch.optim as optim
 import time
 from model.utils import load_checkpoint, save_all
@@ -92,16 +92,17 @@ def test(model, data_iter, data_tag):
         sample_cnt += outputs[0].shape[0]
 
     result = evaluate(output_with_label, data_tag)
+    recall_result = output_info(output_with_label)
     model.train()
-    return test_loss / sample_cnt, result
+    return test_loss / sample_cnt, result, recall_result
 
 draw_points = []
 train(seq2seq, optimizer, review_train_iter, review_val_iter, REVIEW_NUM_EPOCHS, "review", draw_points)
 train(seq2seq, optimizer, need_train_iter, need_val_iter, NEED_NUM_EPOCHS, "need", draw_points)
-_, test_result = test(seq2seq, need_test_iter, "need")
+_, test_result, recall_result = test(seq2seq, need_test_iter, "need")
 
 checkpoint = {
     "state_dict": seq2seq.state_dict(),
     "optimizer": optimizer.state_dict()
 }
-save_all(checkpoint, draw_points, test_result)
+save_all(checkpoint, draw_points, test_result, recall_result)

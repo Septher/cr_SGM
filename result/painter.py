@@ -54,4 +54,17 @@ def show_test_recall():
     for device in terms:
         show_cat_plot(data_points[device], device)
 
-show_result()
+# show_result()
+
+def show_recall_for_each_value_of_all_attribute(training_set: DataFrame, training_result):
+    # sample size in training set
+    info = {}
+    for _, row in training_set.iterrows():
+        for device in DEVICE_ORDER:
+            value = row[device]
+            device_info = info.get(device, {})
+            cnt = device_info.get(value, 0) + 1
+            device_info[value] = cnt
+            info[device] = device_info
+    # recall
+    pass

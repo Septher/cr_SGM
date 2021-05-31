@@ -11,6 +11,25 @@ def evaluate(output_with_label, data_tag):
     show_result(result, data_tag)
     return result
 
+def output_info(output_with_label):
+    result = {}
+    for index, device in enumerate(DEVICE_ORDER):
+        outputs = torch.cat([output[index] for output, _ in output_with_label], dim=0)
+        labels = torch.cat([label_dict[device] for _, label_dict in output_with_label], dim=0)
+        indices = torch.argmax(outputs, dim=0)
+        equals = indices == labels
+        sample_cnt = outputs.size()[0]
+        device_result = {}
+        for i in range(sample_cnt):
+            actual = labels[i].item()
+            (true, total) = device_result.get(actual, (0, 0))
+            device_result[actual] = (true + 1, total + 1) if equals[i].items() else (true, total + 1)
+        for key in device_result.keys():
+            (true, total) = device_result[key]
+            device_result[key] = 1.0 * true / total
+        result[device] = device_result
+    return result
+
 log2 = [1.0 / math.log2(k + 2) for k in range(K)]
 def calculate(outputs, labels):
     sample_cnt = outputs.size()[0]
