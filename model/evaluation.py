@@ -17,7 +17,6 @@ def output_info(output_with_label):
         outputs = torch.cat([output[index] for output, _ in output_with_label], dim=0)
         labels = torch.cat([label_dict[device] for _, label_dict in output_with_label], dim=0)
         indices = torch.argmax(outputs, dim=1)
-        print(indices.shape, outputs.shape)
         sample_cnt = outputs.size()[0]
         device_result = {}
         for i in range(sample_cnt):

@@ -9,7 +9,7 @@ loss_file_prefix = prefix + "training_process/"
 model_file_prefix = prefix + "saved_model/"
 params_file_prefix = prefix + "params/"
 test_file_prefix = prefix + "test_result/"
-output_file_prefix = prefix + "output_result"
+output_file_prefix = prefix + "output_result/"
 columns = ["tag", "device", "epoch", "steps", "training_loss", "val_loss", "score", "description"]
 
 def save_checkpoint(state, path):
