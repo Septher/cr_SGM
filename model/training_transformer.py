@@ -18,7 +18,7 @@ pad_idx = TEXT.vocab.stoi["<pad>"]
 criterion = LabelSmoothing(smoothing=0.05)
 
 if load_model:
-    load_checkpoint(torch.load("50_no_clip_review_checkpoint.pth.tar"), seq2seq, optimizer)
+    load_checkpoint(torch.load("05-31-21-05.pth.tar"), seq2seq, optimizer)
 
 def train(model, optimizer, train_iter, val_iter, num_epochs, data_tag, points):
     model.train()
@@ -92,17 +92,17 @@ def test(model, data_iter, data_tag):
         sample_cnt += outputs[0].shape[0]
 
     result = evaluate(output_with_label, data_tag)
-    # recall_result = output_info(output_with_label)
+    recall_result = output_info(output_with_label)
     model.train()
-    return test_loss / sample_cnt, result, None
+    return test_loss / sample_cnt, result, recall_result
 
 draw_points = []
-train(seq2seq, optimizer, review_train_iter, review_val_iter, REVIEW_NUM_EPOCHS, "review", draw_points)
-train(seq2seq, optimizer, need_train_iter, need_val_iter, NEED_NUM_EPOCHS, "need", draw_points)
-_, test_result, _ = test(seq2seq, need_test_iter, "need")
+# train(seq2seq, optimizer, review_train_iter, review_val_iter, REVIEW_NUM_EPOCHS, "review", draw_points)
+# train(seq2seq, optimizer, need_train_iter, need_val_iter, NEED_NUM_EPOCHS, "need", draw_points)
+_, test_result, recall_result = test(seq2seq, need_test_iter, "need")
 
 checkpoint = {
     "state_dict": seq2seq.state_dict(),
     "optimizer": optimizer.state_dict()
 }
-save_all(checkpoint, draw_points, test_result, None)
+save_all(checkpoint, draw_points, test_result, recall_result)

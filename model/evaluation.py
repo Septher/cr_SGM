@@ -17,13 +17,13 @@ def output_info(output_with_label):
         outputs = torch.cat([output[index] for output, _ in output_with_label], dim=0)
         labels = torch.cat([label_dict[device] for _, label_dict in output_with_label], dim=0)
         indices = torch.argmax(outputs, dim=0)
-        equals = indices == labels
+        print(indices.shape, outputs.shape)
         sample_cnt = outputs.size()[0]
         device_result = {}
         for i in range(sample_cnt):
             actual = labels[i].item()
             (true, total) = device_result.get(actual, (0, 0))
-            device_result[actual] = (true + 1, total + 1) if equals[i].items() else (true, total + 1)
+            device_result[actual] = (true + 1, total + 1) if indices[i] == labels[i] else (true, total + 1)
         for key in device_result.keys():
             (true, total) = device_result[key]
             device_result[key] = 1.0 * true / total
