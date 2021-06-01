@@ -18,7 +18,7 @@ pad_idx = TEXT.vocab.stoi["<pad>"]
 criterion = LabelSmoothing(smoothing=0.05)
 
 if load_model:
-    load_checkpoint(torch.load("../result/saved_model/g05-31-21-05.pth.tar"), seq2seq, optimizer)
+    load_checkpoint(torch.load("../result/saved_model/05-31-21-05.pth.tar"), seq2seq, optimizer)
 
 def train(model, optimizer, train_iter, val_iter, num_epochs, data_tag, points):
     model.train()
