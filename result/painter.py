@@ -56,8 +56,18 @@ def show_test_recall():
 
 # show_result()
 
-def show_recall_for_each_value_of_all_attribute(training_set: DataFrame, training_result):
+label_cnt = {
+    "cpu": 10,
+    "screen": 6,
+    "ram": 6,
+    "hdisk": 10,
+    "gcard": 8
+}
+
+def show_recall_for_each_value_of_all_attribute(training_set_path, training_result_path):
     # sample size in training set
+    names = ["text"] + DEVICE_ORDER
+    training_set = pd.read_csv(training_set_path, sep="\t", names=names)
     info = {}
     for _, row in training_set.iterrows():
         for device in DEVICE_ORDER:
@@ -67,4 +77,21 @@ def show_recall_for_each_value_of_all_attribute(training_set: DataFrame, trainin
             device_info[value] = cnt
             info[device] = device_info
     # recall
-    pass
+    with open(training_result_path, "r") as file:
+        training_result = json.load(file)
+        print(training_result)
+        print(info)
+        file.close()
+    data = []
+    for device in DEVICE_ORDER:
+        for i in range(label_cnt[device]):
+            data.append([device, str(i), training_result[device].get(str(i), 0.0), info[device].get(i, 0)])
+    df = DataFrame(data=data, columns=["Attribute", "Label", "Recall", "Number of Training Samples"])
+
+    # draw picture
+    sns.set_theme(style="whitegrid")
+    sns.scatterplot(x="Number of Training Samples", y="Recall",
+                    hue="Attribute", size="Label",
+                    data=df)
+    plt.show()
+# show_recall_for_each_value_of_all_attribute("../data/processed/need_train.tsv", "output_result/06-01-16-29.json")
